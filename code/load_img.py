@@ -7,7 +7,7 @@ import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
 
 def downsample_z_axis(img, downsampling_factor=3):
-    return block_reduce(img, block_size=(downsampling_factor,1,1), func=np.max)
+    return block_reduce(img, block_size=(1,1,downsampling_factor), func=np.max)
 
 
 def show_slices(slices):
@@ -17,51 +17,22 @@ def show_slices(slices):
     
     plt.show()
 
-
-img = nib.load('T1_3.nii')
-
-
-img2= img.get_fdata()
-
-slices_0= img2[100,96:128,96:128]
-
-downslampled = downsample_z_axis(img2,downsampling_factor=3)
-print(downslampled.shape)
-
-# try passing to fourier and filtering to get Downsampled images
-from scipy import fftpack
-
-
-img_loaded = nib.load('T1_3.nii')
-
-img_data= img.get_fdata()#.transpose((2,1,0))
-print(img_data.shape)
-
-n_transform = np.fft.fftn(img_data)
-
-
-
-nshift = np.fft.fftshift(n_transform,axes=0)
-freq = np.fft.fftfreq(img_data.shape[0])
-f=nshift
-f[0:58,::,::]=0
-f[117:-1,::,::]=0
-f2=nshift[58:117,::,::]
-f2_dows = np.fft.ifftn(f2).squeeze()
-downsampled=np.fft.ifftn(f).squeeze()
-print(downsampled.shape)
-print(f2_dows.shape)
-slice=100
-
-indx= round(slice*f2.shape[0]/img_data.shape[1])
-print(indx)
-print(nshift.shape)
-fig,ax=plt.subplots(1,3)
-ax[0].imshow(abs(f2_dows[::,50,::]),cmap="gray")
-ax[1].imshow(abs(downsampled[::,50,::]),cmap="gray")
-ax[2].imshow(img_data[::,50,::],cmap="gray")
-plt.show()
-
+#function that receives 3D version image along z direction
+#down_factor is the parts de space will be divided and only center will be kept
+def downsample_onFSpace_3D(img,down_factor=3):
+    import numpy as np
+    
+    fft_imag = np.fft.fftn(img)#n-fourier transform
+    shift_fft_imag = np.fft.fftshift(fft_imag)#fft shifting(zero-frequency component to the center of the spectrum)
+    z_size= shift_fft_imag.shape[2]#z_dimension size for cropping
+    size = round(z_size/(2*down_factor))#size of part according to down factor
+    center = round(z_size/2)-1 #center for cutting
+    crop_ffs = shift_fft_imag[::,::,center-size:center+size]#cropping kspace
+    shift_ifft_crop_ffs = np.fft.ifftshift(crop_ffs)#inverse shiftt
+    ifft_crop_ffs = np.fft.ifftn(shift_ifft_crop_ffs)#inverse fast fourier transform
+    print('Thickness of slice is now ',down_factor, 'times that it originally was')
+    return abs(ifft_crop_ffs)#returns cropped version of the origianl image 
+    
 
 
 

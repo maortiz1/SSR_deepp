@@ -1,0 +1,6 @@
+images/
+*.nii
+*.jpeg
+*.jpg
+*.png
+.vscode/

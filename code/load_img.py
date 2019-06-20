@@ -30,9 +30,15 @@ def downsample_onFSpace_3D(img,down_factor=3):
     crop_ffs = shift_fft_imag[::,::,center-size:center+size]#cropping kspace
     shift_ifft_crop_ffs = np.fft.ifftshift(crop_ffs)#inverse shiftt
     ifft_crop_ffs = np.fft.ifftn(shift_ifft_crop_ffs)#inverse fast fourier transform
-    print('Thickness of slice is now ',down_factor, 'times that it originally was')
+    print('Thickness of slice is now ',down_factor, 'times less that it originally was')
     return abs(ifft_crop_ffs)#returns cropped version of the origianl image 
     
 
 
 
+img = nib.load(os.path.join('images','T1_1.nii'))
+data = img.get_fdata()
+down= downsample_onFSpace_3D(data)
+plt.imshow(down[::,50,::])
+plt.title(str(down.shape))
+plt.show()

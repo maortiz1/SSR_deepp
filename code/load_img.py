@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from skimage.measure import block_reduce
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
+import math
 
 def downsample_z_axis(img, downsampling_factor=3):
     return block_reduce(img, block_size=(1,1,downsampling_factor), func=np.max)
@@ -25,14 +26,42 @@ def downsample_onFSpace_3D(img,down_factor=3):
     fft_imag = np.fft.fftn(img)#n-fourier transform
     shift_fft_imag = np.fft.fftshift(fft_imag)#fft shifting(zero-frequency component to the center of the spectrum)
     z_size= shift_fft_imag.shape[2]#z_dimension size for cropping
-    size = round(z_size/(2*down_factor))#size of part according to down factor
+    size = math.floor(z_size/(down_factor))#size of part according to down factor
     center = round(z_size/2)-1 #center for cutting
-    crop_ffs = shift_fft_imag[::,::,center-size:center+size]#cropping kspace
+    if size%2==0:
+        crop_ffs = shift_fft_imag[::,::,center-size/2:center+size/2]
+    else:
+        size = size+1        
+        crop_ffs = shift_fft_imag[::,::,int(center-(size/2)+1):int(center+(size/2))]
+    #crop_ffs = shift_fft_imag[::,::,center-size:center+size]#cropping kspace
     shift_ifft_crop_ffs = np.fft.ifftshift(crop_ffs)#inverse shiftt
     ifft_crop_ffs = np.fft.ifftn(shift_ifft_crop_ffs)#inverse fast fourier transform
     print('Thickness of slice is now ',down_factor, 'times less that it originally was')
     return abs(ifft_crop_ffs)#returns cropped version of the origianl image 
-    
+
+
+def downsample_onFSpace_0pad_3D(img_nib,down_factor=3):
+    import numpy as np
+    import nibabel.processing as pr
+
+    res =pr.resample_to_output(img_nib,[1, 1, 1])
+    return res
+    # fft_imag = np.fft.fftn(img)#n-fourier transform
+    # shift_fft_imag = np.fft.fftshift(fft_imag)#fft shifting(zero-frequency component to the center of the spectrum)
+    # z_size= shift_fft_imag.shape[2]#z_dimension size for cropping
+    # size = math.floor(z_size/(down_factor))#size of part according to down factor
+    # center = round(z_size/2)-1 #center for cutting
+    # new_fft_zeros = np.zeros(shift_fft_imag.shape)
+    # if size%2==0:
+    #     new_fft_zeros[::,::,center-size/2:center+size/2] = shift_fft_imag[::,::,center-size/2:center+size/2]
+    # else:
+    #     size = size+1        
+    #     new_fft_zeros[::,::,int(center-(size/2)+1):int(center+(size/2))] = shift_fft_imag[::,::,int(center-(size/2)+1):int(center+(size/2))]
+    # #crop_ffs = shift_fft_imag[::,::,center-size:center+size]#cropping kspace
+    # shift_ifft_crop_ffs = np.fft.ifftshift(new_fft_zeros)#inverse shiftt
+    # ifft_crop_ffs = np.fft.ifftn(shift_ifft_crop_ffs)#inverse fast fourier transform
+    # print('Thickness of slice is now ',down_factor, 'times less that it originally was')
+    # return abs(ifft_crop_ffs)#returns cropped version of the origianl image 
 
 
 
@@ -41,4 +70,18 @@ data = img.get_fdata()
 down= downsample_onFSpace_3D(data)
 plt.imshow(down[::,50,::])
 plt.title(str(down.shape))
+print(down.shape)
+plt.show()
+
+img = nib.load(os.path.join('images','T1_1.nii'))
+
+down=  downsample_onFSpace_0pad_3D(img).get_fdata()
+plt.imshow(down[::,50,::])
+plt.title(str(down.shape))
+print(down.shape)
+plt.show()
+
+plt.imshow(data[::,50,::])
+plt.title(str(data.shape))
+print(data.shape)
 plt.show()

@@ -54,8 +54,17 @@ class Trainer:
             p,s = self.metrics(target,score)
             psnr_c.append(p)
             ssim_c.append(s)
+            print('Epoch: [{0}][{1}/{2}]\t'
+              'Loss {losss.val:.4f} ({losss.avg:.4f})\t'
+              'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
+                  self.ac_epoch,
+                  i + 1,
+                  len(self.data_loader_train),
+                  losss=loss,
+                  acc=psnr))
+
         
-        pr
+        
         psnr_L.append(np.mean(psnr_c))
         ssmi_L.append(np.mean(ssim_c))
 

@@ -43,7 +43,7 @@ def downsample_onFSpace_3D(img,down_factor=3):
 def downsample_onFSpace_0pad_3D(img_nib,down_factor=3):
     import numpy as np
     import nibabel.processing as pr
-    res = downsample_onFSpace_3D(img)
+    res = downsample_onFSpace_3D(img,down_factor)
     return res
     # fft_imag = np.fft.fftn(img)#n-fourier transform
     # shift_fft_imag = np.fft.fftshift(fft_imag)#fft shifting(zero-frequency component to the center of the spectrum)

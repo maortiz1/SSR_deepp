@@ -31,8 +31,11 @@ class Trainer:
         self.model.train()
         psnr_L=[]
         ssmi_L=[]
-
+        psnr_c = []
+        ssim_c = []
         for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_train),total=len(self.data_loader_train),desc='Train epoch =%d'%self.ac_epoch,ncols=80,leave=False):
+            psnr_c = []
+            ssim_c = []
             iteration = batch_idx + self.ac_epoch*len(self.data_loader_train)
             if self.iteration !=0 and (iteration -1 )!= self.iteration:
                 continue
@@ -47,10 +50,15 @@ class Trainer:
                 raise ValueError('loss is nan while training')
             loss.backward()
             self.optimizer.step()
-            psnr_c, ssim_c = self.metrics(target,score)
-            psnr_L.append(psnr_c)
-            ssmi_L.append(ssim_c)
-            
+            SR_pred = 
+            p,s = self.metrics(target,score)
+            psnr_c.append(p)
+            ssim_c.append(s)
+        
+        pr
+        psnr_L.append(np.mean(psnr_c))
+        ssmi_L.append(np.mean(ssim_c))
+
 
 
     def metrics(self,true_img,pred_img):

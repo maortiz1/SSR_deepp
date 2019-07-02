@@ -84,3 +84,6 @@ plt.imshow(data[::,50,::])
 plt.title(str(data.shape))
 print(data.shape)
 plt.show()
+
+
+

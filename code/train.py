@@ -7,7 +7,10 @@ import tqdm
 import numpy as np
 from skimage.measure import compare_psnr as psnr
 from skimage.measure import compare_ssim as ssim
-
+from torch.utils import data
+import image_utils as utils
+import glob
+import os
 class Trainer:
     def __init__(self, loader_train,loader_test,cuda,scale,model,lr):
         self.scale = scale
@@ -50,7 +53,6 @@ class Trainer:
                 raise ValueError('loss is nan while training')
             loss.backward()
             self.optimizer.step()
-            SR_pred = 
             p,s = self.metrics(target,score)
             psnr_c.append(p)
             ssim_c.append(s)
@@ -58,7 +60,6 @@ class Trainer:
               'Loss {losss.val:.4f} ({losss.avg:.4f})\t'
               'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
                   self.ac_epoch,
-                  i + 1,
                   len(self.data_loader_train),
                   losss=loss,
                   acc=psnr))
@@ -77,6 +78,34 @@ class Trainer:
 
 
 
+class Preprocessing():
+    def __init__(self,root_hr):
+        self.root_hr = root_hr
+        if os.path.isdir(root_hr):
+            self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
+        else:
+            raise Exception('Root has to be a directory')
+    def get_lr_ls(self,factor=3):
+        lr =[]
+        for i in self.root_hr:
+            lr_temp = utils.downsample(i, down_factor=factor)
+            lr.append(lr_temp)
+        self.lr = lr
 
 
-    
+
+
+
+
+class Dataset(data.Dataset):
+    def __init__(self,data_hr,transform = None):
+        self.data_hr =data_hr 
+        self.transform = transform
+    def __len__(self):
+        return len(self.data_hr)
+    def __getitem__(self,index):
+        y = self.data_hr
+
+
+        
+

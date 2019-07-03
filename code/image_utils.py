@@ -23,17 +23,34 @@ def downsample(img,down_factor=3):
 
 def normalize_image_whitestripe(img,contrast= 'T1'):
     from intensity_normalization.normalize import whitestripe
-    from torchvision.transforms import normalize
+
     mask = whitestripe.whitestripe(img,contrast)
     norm_image = whitestripe.whitestripe_norm(img,mask)
     return norm_image
 
 
 
-def voxelize_image(img,vox_size):
+def voxelize_image(img,vox_size,n_samples=40):
+    import numpy as np
+    import math
     size_x = img.shape[0]
     size_y = img.shape[1]
     size_z = img.shape[2]
+    no_vx_x = math.floor(size_x/vox_size[0])
+
+    voxels = np.empty((n_samples,vox_size[0],vox_size[1],vox_size[2]))
+
+    for i in range(0,n_samples):
+        r_x = int(np.floor(img.shape[0]-vox_size[0])* np.random.rand(1))
+        r_y = int(np.floor(img.shape[1]-vox_size[1])* np.random.rand(1))
+        r_z = int(np.floor(img.shape[1]-vox_size[2])* np.random.rand(1))
+        crop = img[r_x:r_x + vox_size[0],r_y:r_y+vox_size[1],::]
+
+        voxels[i,::,::,::] = crop
+    return voxels
+
+
+
     
 
 import nibabel as nib
@@ -60,10 +77,17 @@ fig.colorbar(b,ax=ax[1])
 plt.show()
 
 import intensity_normalization.plot.hist as hist
-norm = normalize_image_whitestripe(img)
-lr_norm_down = downsample(norm.get_fdata())
-lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4))
+
+lr_norm_down = downsample(img.get_fdata())
+lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4)) 
+norm = normalize_image_whitestripe(lr_nib)
 fig,ax = plt.subplots(1,2)
 hist.hist(norm,ax=ax[0])
 hist.hist(img,ax=ax[1])
+plt.show()
+
+lr_norm_down=norm.get_fdata()
+vox = voxelize_image(lr_norm_down,(32,32,lr_norm_down.shape[2]),n_samples=40)
+print(vox)
+plt.imshow(vox[10,::,::,40],cmap='gray')
 plt.show()

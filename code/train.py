@@ -11,6 +11,7 @@ from torch.utils import data
 import image_utils as utils
 import glob
 import os
+import nibabel as nib 
 class Trainer:
     def __init__(self, loader_train,loader_test,cuda,scale,model,lr):
         self.scale = scale
@@ -56,13 +57,8 @@ class Trainer:
             p,s = self.metrics(target,score)
             psnr_c.append(p)
             ssim_c.append(s)
-            print('Epoch: [{0}][{1}/{2}]\t'
-              'Loss {losss.val:.4f} ({losss.avg:.4f})\t'
-              'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
-                  self.ac_epoch,
-                  len(self.data_loader_train),
-                  losss=loss,
-                  acc=psnr))
+            print('Epoch: ',self.ac_epoch,'\t loss:',str(loss))
+
 
         
         
@@ -88,10 +84,14 @@ class Preprocessing():
     def get_lr_ls(self,factor=3):
         lr =[]
         for i in self.root_hr:
-            lr_temp = utils.downsample(i, down_factor=factor)
-            lr.append(lr_temp)
+            img = nib.load(i)
+            data = img.get_fdata()
+            lr_temp = utils.downsample(data, down_factor=factor)
+            lr_nib = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+            lr.append(lr_nib)
         self.lr = lr
 
+    
 
 
 

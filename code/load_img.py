@@ -85,5 +85,3 @@ plt.title(str(data.shape))
 print(data.shape)
 plt.show()
 
-
-

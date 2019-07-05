@@ -84,7 +84,7 @@ class Data_Preparation():
         self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
     def generate_lr_ls_vx(self,factor=3,vox_size=(32,32),train_size=.7,n_samples=40):
         tr_size = round(len(self.gt_hr)*train_size)-1
-        tst_size = len(self.gt_hr) - tr_size-1
+       # tst_size = len(self.gt_hr) - tr_size-1
         
         img = nib.load(self.gt_hr[0])
         data = img.get_fdata()
@@ -166,4 +166,4 @@ class Dataset(data.Dataset):
         
 
 ## test
-root = ''
+root = os.path.join(os.getcwd(),'images')

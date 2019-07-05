@@ -29,25 +29,29 @@ def normalize_image_whitestripe(img,contrast= 'T1'):
     return norm_image
 
 
-
-def voxelize_image(img,vox_size,n_samples=40):
+#n number of sized voxels from inserted volume
+def voxelize_image(img_lr,img_hr,vox_size,n_samples=40):
     import numpy as np
     import math
-    size_x = img.shape[0]
-    size_y = img.shape[1]
-    size_z = img.shape[2]
-    no_vx_x = math.floor(size_x/vox_size[0])
+    size_x = img_lr.shape[0]
+    size_y = img_lr.shape[1]
+    # size_z = img.shape[2]
 
-    voxels = np.empty((n_samples,vox_size[0],vox_size[1],vox_size[2]))
-
+    voxels_lr = np.empty((n_samples,vox_size[0],vox_size[1]),img_lr.shape[2])
+    voxels_hr = np.empty((n_samples,vox_size[0],vox_size[1],img_hr.shape[2]))
+    if ((size_x/vox_size[0])<1) or ((size_y/vox_size[1]) <1):
+        raise Exception('The size of the desired voxel is to big')
+    
     for i in range(0,n_samples):
-        r_x = int(np.floor(img.shape[0]-vox_size[0])* np.random.rand(1))
-        r_y = int(np.floor(img.shape[1]-vox_size[1])* np.random.rand(1))
-        r_z = int(np.floor(img.shape[1]-vox_size[2])* np.random.rand(1))
-        crop = img[r_x:r_x + vox_size[0],r_y:r_y+vox_size[1],::]
+        r_x = int(np.floor(size_x-vox_size[0])* np.random.rand(1))
+        r_y = int(np.floor(size_y-vox_size[1])* np.random.rand(1))
+        # r_z = int(np.floor(img.shape[1]-vox_size[2])* np.random.rand(1))
+        crop_lr = img_lr[r_x:r_x + vox_size[0],r_y:r_y+vox_size[1],::]
+        voxels_lr[i,::,::,::] = crop_lr
 
-        voxels[i,::,::,::] = crop
-    return voxels
+        crop_hr = img_hr[r_x:r_x + vox_size[0],r_y:r_y+vox_size[1],::]
+        voxels_hr[i,::,::,::] = crop_hr
+    return voxels_lr,voxels_hr
 
 
 
@@ -89,5 +93,5 @@ plt.show()
 lr_norm_down=norm.get_fdata()
 vox = voxelize_image(lr_norm_down,(32,32,lr_norm_down.shape[2]),n_samples=40)
 print(vox)
-plt.imshow(vox[10,::,::,40],cmap='gray')
+plt.imshow(vox[10,::,24,::],cmap='gray')
 plt.show()

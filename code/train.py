@@ -74,38 +74,96 @@ class Trainer:
 
 
 
-class Preprocessing():
-    def __init__(self,root_hr):
+class Data_Preparation():
+    def __init__(self,root_hr,factor=3,vox_size=(32,32),train_size=.7,n_samples=40):
         self.root_hr = root_hr
         if os.path.isdir(root_hr):
             self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
         else:
             raise Exception('Root has to be a directory')
-    def get_lr_ls(self,factor=3):
-        lr =[]
-        for i in self.root_hr:
-            img = nib.load(i)
-            data = img.get_fdata()
-            lr_temp = utils.downsample(data, down_factor=factor)
-            lr_nib = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-            lr.append(lr_nib)
-        self.lr = lr
+        self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
+    def generate_lr_ls_vx(self,factor=3,vox_size=(32,32),train_size=.7,n_samples=40):
+        tr_size = round(len(self.gt_hr)*train_size)-1
+        tst_size = len(self.gt_hr) - tr_size-1
+        
+        img = nib.load(self.gt_hr[0])
+        data = img.get_fdata()
+        z_size_hr = data.shape[2]
+        lr_temp = utils.downsample(data, down_factor=factor)
+        z_size_lr = lr_temp.shape[2]
 
+      
+        lr_vox = np.empty((n_samples*tr_size,vox_size[0],vox_size[1],z_size_lr))
+        hr_vox = np.empty((n_samples*tr_size,vox_size[0],vox_size[1],z_size_hr))
+        all_train_lr = []
+        all_train_hr = []
+        for i,img_r in enumerate(self.gt_hr[0:tr_size]):
+            img = nib.load(img_r) # read data file
+        
+            data = img.get_fdata()#get data from file
+            data_wh = utils.normalize_image_whitestripe(img)#normalize hr image to wh
+
+            lr_temp = utils.downsample(data, down_factor=factor)#downsampled hr image
+            lr_nib = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+            lr_norm_wh = utils.normalize_image_whitestripe(lr_nib)# normalize lr image
+
+            voxels_lr,voxels_hr = utils.voxelize_image(lr_norm_wh.get_fdata(),data_wh.get_fdata(),vox_size,n_samples) # pairs of lr and hr voxels
+            
+            #all images lr, hr voxels
+            lr_vox[i*n_samples:i*n_samples+n_samples,::,::,::] = voxels_lr
+            hr_vox[i*n_samples:i*n_samples+n_samples,::,::,::] = voxels_hr
+            
+            #not voxelize data
+            all_train_hr.append(data_wh.get_fdata())
+            all_train_lr.append(lr_norm_wh.get_fdata())
+        #all data 
+        self.lr_train_vox = lr_vox
+        self.lr_train_img = all_train_lr
+        self.hr_train_vox = hr_vox
+        self.hr_train_img = all_train_hr
+
+        test_img_hr = []
+        test_img_lr = []
+        for i,img_r in enumerate(self.gt_hr[tr_size:-1]):
+            img = nib.load(img_r) # read data file
+        
+            data = img.get_fdata()#get data from file
+            data_wh = utils.normalize_image_whitestripe(img)#normalize hr image to wh
+            test_img_hr.append(data_wh.get_fdata())
+
+            lr_temp = utils.downsample(data, down_factor=factor)#downsampled hr image
+            lr_nib = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+            lr_norm_wh = utils.normalize_image_whitestripe(lr_nib)# normalize lr image           
+            test_img_lr.append(lr_norm_wh.get_fdata()) 
+
+
+        self.test_hr_data = test_img_hr
+        self.test_lr_data = test_img_lr
     
 
 
 
 
-
 class Dataset(data.Dataset):
-    def __init__(self,data_hr,transform = None):
-        self.data_hr =data_hr 
+    def __init__(self,vox_hr,vox_lr,transform=None):
+        self.data_hr = vox_hr
+        self.data_lr = vox_lr
         self.transform = transform
     def __len__(self):
+        'Denotes the total number of samples'
         return len(self.data_hr)
     def __getitem__(self,index):
-        y = self.data_hr
+        y = self.data_hr[index,::,::,::]
+        x = self.data_lr[index,::,::,::]
+        if self.transform:
+            x = self.transform(x)
+            y = self.transform(y)
+        
+        return x,y
+
 
 
         
 
+## test
+root = ''

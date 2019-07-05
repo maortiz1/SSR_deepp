@@ -163,7 +163,4 @@ class Dataset(data.Dataset):
 
 
 
-        
 
-## test
-root = os.path.join(os.getcwd(),'images')

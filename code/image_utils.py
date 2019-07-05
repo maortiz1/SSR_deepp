@@ -37,7 +37,7 @@ def voxelize_image(img_lr,img_hr,vox_size,n_samples=40):
     size_y = img_lr.shape[1]
     # size_z = img.shape[2]
 
-    voxels_lr = np.empty((n_samples,vox_size[0],vox_size[1]),img_lr.shape[2])
+    voxels_lr = np.empty((n_samples,vox_size[0],vox_size[1],img_lr.shape[2]))
     voxels_hr = np.empty((n_samples,vox_size[0],vox_size[1],img_hr.shape[2]))
     if ((size_x/vox_size[0])<1) or ((size_y/vox_size[1]) <1):
         raise Exception('The size of the desired voxel is to big')
@@ -57,38 +57,38 @@ def voxelize_image(img_lr,img_hr,vox_size,n_samples=40):
 
     
 
-import nibabel as nib
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-img = nib.load(os.path.join('images','T1_1.nii'))
-data = img.get_fdata()
-lr = downsample(data)
-lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4))
-norm = normalize_image_whitestripe(lr_nib).get_fdata()
+# import nibabel as nib
+# import os
+# import numpy as np
+# import matplotlib.pyplot as plt
+# img = nib.load(os.path.join('images','T1_1.nii'))
+# data = img.get_fdata()
+# lr = downsample(data)
+# lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4))
+# norm = normalize_image_whitestripe(lr_nib).get_fdata()
 
-plt.imshow(norm[::,50,::],cmap='gray')
-plt.show()
+# plt.imshow(norm[::,50,::],cmap='gray')
+# plt.show()
 
-#LR
+# #LR
 
-fig,ax = plt.subplots(1,2)
+# fig,ax = plt.subplots(1,2)
 
-a=ax[0].imshow(norm[::,50,::],cmap='gray')
-fig.colorbar(a,ax=ax[0])
-b= ax[1].imshow(lr[::,50,::],cmap='gray')
-fig.colorbar(b,ax=ax[1])
-plt.show()
+# a=ax[0].imshow(norm[::,50,::],cmap='gray')
+# fig.colorbar(a,ax=ax[0])
+# b= ax[1].imshow(lr[::,50,::],cmap='gray')
+# fig.colorbar(b,ax=ax[1])
+# plt.show()
 
-import intensity_normalization.plot.hist as hist
+# import intensity_normalization.plot.hist as hist
 
-lr_norm_down = downsample(img.get_fdata())
-lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4)) 
-norm = normalize_image_whitestripe(lr_nib)
-fig,ax = plt.subplots(1,2)
-hist.hist(norm,ax=ax[0])
-hist.hist(img,ax=ax[1])
-plt.show()
+# lr_norm_down = downsample(img.get_fdata())
+# lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4)) 
+# norm = normalize_image_whitestripe(lr_nib)
+# fig,ax = plt.subplots(1,2)
+# hist.hist(norm,ax=ax[0])
+# hist.hist(img,ax=ax[1])
+# plt.show()
 
 # lr_norm_down=norm.get_fdata()
 # vox = voxelize_image(lr_norm_down,(32,32,lr_norm_down.shape[2]),n_samples=40)

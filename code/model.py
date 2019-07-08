@@ -57,9 +57,9 @@ class ResNET(nn.Module):
         res = self.body(x)
         res+=x
 
-        print(res.size())
+
         x=self.tail(res)
-        print(x.size())
+
         return x
     def load_state_dict(self,state_dict, strict = True):
         own_state = self.state_dict()

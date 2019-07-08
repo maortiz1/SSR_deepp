@@ -13,7 +13,7 @@ import glob
 import os
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out):
         self.scale = scale
         self.data_loader_train = loader_train
         self.data_loader_test = loader_test
@@ -24,6 +24,8 @@ class Trainer:
         self.error_last = 1e8
         self.ac_epoch= 0
         self.iteration = 0
+        self.out_f = out
+        os.mkdir(self.out_f)
        
         
 
@@ -56,22 +58,28 @@ class Trainer:
                 raise ValueError('loss is nan while training')
             loss.backward()
             self.optimizer.step()
-            p,s = self.metrics(target,score)
-            psnr_c.append(p)
-            ssim_c.append(s)
-            print('Epoch: ',self.ac_epoch,'\t loss:',str(loss))
+            for k in range(0,self.data_loader_train.batch_size):   
+              t = target[k,::,::,::,::]  
+              s = score[k,::,::,::,::]          
+              p,s = self.metrics(t.squeeze(),s.squeeze())
+              psnr_c.append(p)
+              ssim_c.append(s)
+            print('\n Epoch: ',self.ac_epoch,'\t loss:',str(loss.item()))
 
 
         
         
         psnr_L.append(np.mean(psnr_c))
         ssmi_L.append(np.mean(ssim_c))
+        torch.save({'epoch':self.ac_epoch,'model_state_dict': self.model.state_dict(),'model':self.model,},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
+        print('Mean PSNR',str(np.mean(psnr_c)))
 
 
 
     def metrics(self,true_img,pred_img):
-        psnr_c = psnr(true_img,pred_img)
-        ssim_c = ssim(true_img,pred_img)
+        
+        psnr_c = psnr(true_img.data.cpu().numpy(),pred_img.data.cpu().numpy())
+        ssim_c = ssim(true_img.data.cpu().numpy(),pred_img.data.cpu().numpy())
         return psnr_c,ssim_c
 
 

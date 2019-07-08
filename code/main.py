@@ -19,10 +19,11 @@ def main():
 
     trainDataset = train.Dataset(hr_train_vox,lr_train_vox,transform=image_utils.normalize)
     output_sz = (trainDataset[1][1]).squeeze().size()
-    bt_size = 1
+    bt_size = 5
     shuffle = True
     train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
-
+    out_f = 'chkpt'
+    
     print(output_sz)
     lr_test = dataprep.test_lr_data
     hr_test = dataprep.test_hr_data
@@ -32,7 +33,7 @@ def main():
     lr = 0.001
     if cuda:
       ResNet.to('cuda')
-    trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,ResNet,lr)
+    trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,ResNet,lr,out_f)
     max_epoch = 1000
     trainer.train(max_epoch)
 

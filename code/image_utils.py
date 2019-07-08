@@ -53,6 +53,14 @@ def voxelize_image(img_lr,img_hr,vox_size,n_samples=40):
         voxels_hr[i,::,::,::] = crop_hr
     return voxels_lr,voxels_hr
 
+def normalize(img):
+    import numpy as np
+
+    maxA = np.amax(img)
+    minA = np.amin(img)
+    norm_img = (img - minA)/(maxA-minA)
+    return norm_img
+
 
 
     
@@ -94,4 +102,20 @@ def voxelize_image(img_lr,img_hr,vox_size,n_samples=40):
 # vox = voxelize_image(lr_norm_down,(32,32,lr_norm_down.shape[2]),n_samples=40)
 # print(vox)
 # plt.imshow(vox[10,::,24,::],cmap='gray')
+# plt.show()
+
+# import nibabel as nib
+# import os
+# import matplotlib.pyplot as plt
+
+
+# img = nib.load(os.path.join('images','T1_1.nii'))
+
+# wh = normalize_image_whitestripe(img)
+# data = wh.get_fdata()
+# data_norm = normalize(data)
+
+# fig,ax = plt.subplots(1,2)
+# ax[0].imshow(data[::,50,::])
+# ax[1].imshow(data_norm[::,50,::])
 # plt.show()

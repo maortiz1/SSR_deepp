@@ -33,12 +33,12 @@ class ResBlock(nn.Module):
 #kernel_size 
 #
 class ResNET(nn.Module):
-    def __init__(self, n_resblocks, planes, inplanes,scale,output_size,res_scale=1,kernel_size=3):
+    def __init__(self, n_resblocks,scale,output_size,res_scale=1,kernel_size=3):
         super(ResNET,self).__init__()
-        m_head = [nn.Conv3d(inplanes,planes,kernel_size)]
-        m_body = [ResBlock(inplanes,planes,res_scale) for i in range(n_resblocks)]
+        m_head = [nn.Conv3d(64,64,kernel_size)]
+        m_body = [ResBlock(64,64,res_scale) for i in range(n_resblocks)]
         #tail upsampling block
-        m_tail_up =[nn.Conv3d(inplanes,planes*scale,kernel_size),nn.LeakyReLU,nn.Upsample(size=output_size,mode='trilinear')]
+        m_tail_up =[nn.Conv3d(64,64*scale,kernel_size),nn.LeakyReLU(),nn.Upsample(size=output_size,mode='trilinear')]
     
         self.head=nn.Sequential(*m_head)
         self.body = nn.Sequential(*m_body)

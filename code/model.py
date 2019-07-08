@@ -9,20 +9,23 @@ from torch.autograd import Variable
 
 class ResBlock(nn.Module):
     #initialization of resbloc
-    def __init__(self, inplanes, planes,res_scale=1):
-        super(ResBlock,self).__init__
-        
+    def __init__(self, inplanes, planes,padding_e,res_scale=1):
+        super(ResBlock,self).__init__()
+
         layers=[]
-        #building up layers on resbloc
+        #building up layers on resblocnvidia
         for i in range(2):
-            layers.append(nn.Conv3d(inplanes,planes,kernel_size=3))
+            layers.append(nn.Conv3d(inplanes,planes,kernel_size=3,padding=padding_e))
             if i == 0:
                 layers.append(nn.ReLU(inplace=True))
         self.body = nn.Sequential(*layers)
         self.res_scale=res_scale
     #residual block forward model
     def forward(self,x):
-        res = self.body(x).mul(self.res_scale) + x
+
+        res= self.body(x)*self.res_scale
+
+        res += x
         return res
 
 
@@ -35,10 +38,12 @@ class ResBlock(nn.Module):
 class ResNET(nn.Module):
     def __init__(self, n_resblocks,scale,output_size,res_scale=1,kernel_size=3):
         super(ResNET,self).__init__()
-        m_head = [nn.Conv3d(64,64,kernel_size)]
-        m_body = [ResBlock(64,64,res_scale) for i in range(n_resblocks)]
+        self.padding =(kernel_size//2) 
+        m_head = [nn.Conv3d(1,64,kernel_size,padding=self.padding)]
+
+        m_body = [ResBlock(64,64,self.padding,res_scale) for i in range(n_resblocks)]
         #tail upsampling block
-        m_tail_up =[nn.Conv3d(64,64*scale,kernel_size),nn.LeakyReLU(),nn.Upsample(size=output_size,mode='trilinear')]
+        m_tail_up =[nn.Conv3d(64,1,kernel_size,self.padding),nn.LeakyReLU(),nn.Upsample(size=output_size,mode='trilinear',align_corners=False)]
     
         self.head=nn.Sequential(*m_head)
         self.body = nn.Sequential(*m_body)
@@ -48,10 +53,13 @@ class ResNET(nn.Module):
 
         x=self.head(x)
 
+
         res = self.body(x)
         res+=x
 
+        print(res.size())
         x=self.tail(res)
+        print(x.size())
         return x
     def load_state_dict(self,state_dict, strict = True):
         own_state = self.state_dict()

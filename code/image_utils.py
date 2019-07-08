@@ -55,9 +55,10 @@ def voxelize_image(img_lr,img_hr,vox_size,n_samples=40):
 
 def normalize(img):
     import numpy as np
+    import torch
+    maxA = img.max()
+    minA = img.min()
 
-    maxA = np.amax(img)
-    minA = np.amin(img)
     norm_img = (img - minA)/(maxA-minA)
     return norm_img
 

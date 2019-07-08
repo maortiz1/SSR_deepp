@@ -24,6 +24,8 @@ class Trainer:
         self.error_last = 1e8
         self.ac_epoch= 0
         self.iteration = 0
+       
+        
 
     def train(self, max_epoch):
         for epoc in tqdm.trange(self.ac_epoch,max_epoch,desc='Train',ncols=80):
@@ -117,10 +119,10 @@ class Data_Preparation():
             all_train_hr.append(data_wh.get_fdata())
             all_train_lr.append(lr_norm_wh.get_fdata())
         #all data 
-        self.lr_train_vox = lr_vox
-        self.lr_train_img = all_train_lr
-        self.hr_train_vox = hr_vox
-        self.hr_train_img = all_train_hr
+        self.lr_train_vox = np.expand_dims(lr_vox,axis=1)
+        self.lr_train_img = np.expand_dims(all_train_lr,axis=1)
+        self.hr_train_vox = np.expand_dims(hr_vox,axis=1)
+        self.hr_train_img = np.expand_dims(all_train_hr,axis=1)
 
         test_img_hr = []
         test_img_lr = []
@@ -153,8 +155,8 @@ class Dataset(data.Dataset):
         'Denotes the total number of samples'
         return len(self.data_hr)
     def __getitem__(self,index):
-        y = self.data_hr[index,::,::,::]
-        x = self.data_lr[index,::,::,::]
+        y = torch.from_numpy(self.data_hr[index,::,::,::,::].astype(np.float32)).permute(0,3,1,2)
+        x = torch.from_numpy(self.data_lr[index,::,::,::,::].astype(np.float32)).permute(0,3,1,2)
         if self.transform:
             x = self.transform(x)
             y = self.transform(y)

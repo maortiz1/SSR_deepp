@@ -1,19 +1,22 @@
+
 import image_utils
 import train
 import model
 import torch
 from torch.utils import data
 import os
+
+
 def main():
  
-    gpu = 1
+    gpu = 0
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     torch.cuda.set_device(gpu)
-    device = 'cuda:1'
+    device = 'cuda:0'
     cuda = torch.cuda.is_available()
     print(torch.cuda.current_device())
     n_resblock = 72
-    root = os.path.join(os.getcwd(),'..','images')
+    root = os.path.join(os.getcwd(),'images')
     dataprep = train.Data_Preparation(root)
     lr_train_vox = dataprep.lr_train_vox
     hr_train_vox = dataprep.hr_train_vox

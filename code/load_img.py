@@ -80,7 +80,7 @@ plt.title(str(down.shape))
 print(down.shape)
 plt.show()
 
-plt.imshow(data[::,50,::])
+plt.imshow(data[15:-16,50,::])
 plt.title(str(data.shape))
 print(data.shape)
 plt.show()

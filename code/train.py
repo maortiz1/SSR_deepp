@@ -11,6 +11,7 @@ from torch.utils import data
 import image_utils as utils
 import glob
 import os
+import math
 import nibabel as nib 
 class Trainer:
     def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device):
@@ -88,11 +89,14 @@ class Trainer:
 class Data_Preparation():
     def __init__(self,root_hr,factor=3,vox_size=(32,32),train_size=.7,n_samples=40):
         self.root_hr = root_hr
+        self.vox_size = vox_size
         if os.path.isdir(root_hr):
             self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
         else:
             raise Exception('Root has to be a directory')
         self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
+        self.cut_test(vox_size)
+
     def generate_lr_ls_vx(self,factor=3,vox_size=(32,32),train_size=.7,n_samples=40):
         tr_size = round(len(self.gt_hr)*train_size)-1
        # tst_size = len(self.gt_hr) - tr_size-1
@@ -140,16 +144,93 @@ class Data_Preparation():
         
             data = img.get_fdata()#get data from file
             data_wh = utils.normalize_image_whitestripe(img)#normalize hr image to wh
-            test_img_hr.append(data_wh.get_fdata())
+            data_wh = np.expand_dims(data_wh.get_fdata(),axis=0)
+            test_img_hr.append(data_wh)
 
             lr_temp = utils.downsample(data, down_factor=factor)#downsampled hr image
             lr_nib = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
             lr_norm_wh = utils.normalize_image_whitestripe(lr_nib)# normalize lr image           
-            test_img_lr.append(lr_norm_wh.get_fdata()) 
+            lr_norm_wh = np.expand_dims(lr_norm_wh.get_fdata(),axis=0)
+            test_img_lr.append(lr_norm_wh)
 
 
         self.test_hr_data = test_img_hr
         self.test_lr_data = test_img_lr
+    
+    def cut_test(self,size):
+        x = size[0]
+        y = size[1]
+        print(x)
+     
+        hr = self.test_hr_data[0]
+        lr = self.test_lr_data[0]
+        shape_x = hr.shape[1]#x
+        shape_y = hr.shape[2]#y
+        
+        n_pieces_x = int( math.floor(shape_x/x))
+        n_pieces_y =int( math.floor(shape_y/y))
+        res_x = int((shape_x-(n_pieces_x*x))/2)
+        res_y =  int((shape_y-(n_pieces_y*y))/2)
+        
+        str_x = res_x
+        str_y = res_y
+        ls_hr_pieces=[]
+        ls_lr_pieces=[]
+        arr_hr_pieces = np.empty((n_pieces_x*n_pieces_y*len(self.test_hr_data),hr.shape[0],x,y,hr.shape[3]))
+        arr_lr_pieces = np.empty((n_pieces_x*n_pieces_y*len(self.test_lr_data),lr.shape[0],x,y,lr.shape[3]))
+        for index, value in enumerate(zip(self.test_hr_data,self.test_lr_data)):        
+            hr = value[0]
+            lr = value[1]
+            pc_hr_img = np.empty((n_pieces_x*n_pieces_y,hr.shape[0],x,y,hr.shape[3]))
+            pc_lr_img = np.empty((n_pieces_x*n_pieces_y,lr.shape[0],x,y,lr.shape[3]))
+            ind = 0
+            for i in range(0,n_pieces_x):
+                for j in range(0,n_pieces_y):
+                    str_ind_x = str_x + i*x
+                    str_ind_y = str_y + j*y 
+                    pc_hr = hr[::,str_ind_x:str_ind_x+x,str_ind_y: str_ind_y+y,::]
+                    pc_lr = lr[::,str_ind_x:str_ind_x+x,str_ind_y:str_ind_y+y ,::]
+                    pc_hr_img[ind,::,::,::,::] = pc_hr
+                    pc_lr_img[ind,::,::,:,::] = pc_lr
+                    ind +=1
+
+            arr_hr_pieces[index*n_pieces_x*n_pieces_y:index*n_pieces_x*n_pieces_y+n_pieces_x*n_pieces_y,::,::,::,::] = pc_hr_img
+            arr_lr_pieces[index*n_pieces_x*n_pieces_y:index*n_pieces_x*n_pieces_y+n_pieces_x*n_pieces_y,::,::,::,::] = pc_lr_img
+
+            ls_hr_pieces.append(pc_hr_img)
+            ls_lr_pieces.append(pc_lr_img)
+
+        self.ls_hr_pieces_test = ls_hr_pieces
+        self.ls_lr_pieces_test = ls_lr_pieces
+        self.arr_hr_pieces_test = arr_hr_pieces
+        self.arr_lr_pieces_test = arr_lr_pieces
+    def reconstr_test(self,img,to_shape):
+        p2=[]
+        return p2
+
+ 
+
+import os
+root = os.path.join(os.getcwd(),'images')
+dataprep = Data_Preparation(root)
+import matplotlib.pyplot as plt
+
+hr= dataprep.arr_hr_pieces_test
+lr = dataprep.arr_lr_pieces_test
+print(hr.shape)
+fig, ax = plt.subplots(1,2)
+ax[0].imshow(hr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
+ax[1].imshow(lr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
+
+plt.show()
+
+arr = dataprep.ls_hr_pieces_test[0]
+recon = dataprep.reconstr_test(arr,(1,1,160,256,256)).squeeze(axis=0)
+plt.figure()
+plt.imshow(recon[::,::,50,::].squeeze(axis=0))
+plt.show()
+
+    
     
 
 

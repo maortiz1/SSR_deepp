@@ -13,7 +13,7 @@ import glob
 import os
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device):
         self.scale = scale
         self.data_loader_train = loader_train
         self.data_loader_test = loader_test
@@ -25,6 +25,7 @@ class Trainer:
         self.ac_epoch= 0
         self.iteration = 0
         self.out_f = out
+        self.device = device
         os.mkdir(self.out_f)
        
         
@@ -49,7 +50,7 @@ class Trainer:
                 continue
             self.iteration= iteration 
             if self.cuda:
-                data, target = data.to('cuda'), target.to('cuda')
+                data, target = data.to(self.device), target.to(self.device)
             self.optimizer.zero_grad()
             score = self.model(data)
             loss = self.loss(score,target)

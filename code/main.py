@@ -24,6 +24,7 @@ def main():
 
     trainDataset = train.Dataset(hr_train_vox,lr_train_vox,transform=image_utils.normalize)
     output_sz = (trainDataset[1][1]).squeeze().size()
+    print(output_sz)
     bt_size = 2
     shuffle = True
     train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)

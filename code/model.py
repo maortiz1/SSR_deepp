@@ -43,7 +43,7 @@ class ResNET(nn.Module):
 
         m_body = [ResBlock(64,64,self.padding,res_scale) for i in range(n_resblocks)]
         #tail upsampling block
-        m_tail_up =[nn.Conv3d(64,1,kernel_size,self.padding),nn.LeakyReLU(),nn.Upsample(size=output_size,mode='trilinear',align_corners=False)]
+        m_tail_up =[nn.Conv3d(64,8,kernel_size,self.padding),nn.LeakyReLU(),nn.Upsample(size=output_size,mode='trilinear',align_corners=False)]
     
         self.head=nn.Sequential(*m_head)
         self.body = nn.Sequential(*m_body)

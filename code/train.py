@@ -169,6 +169,9 @@ class Data_Preparation():
         
         n_pieces_x = int( math.floor(shape_x/x))
         n_pieces_y =int( math.floor(shape_y/y))
+        self.n_pieces_x = n_pieces_x
+        self.n_pieces_y = n_pieces_y
+        self.n_pieces_img = n_pieces_x*n_pieces_y
         res_x = int((shape_x-(n_pieces_x*x))/2)
         res_y =  int((shape_y-(n_pieces_y*y))/2)
         
@@ -204,31 +207,53 @@ class Data_Preparation():
         self.ls_lr_pieces_test = ls_lr_pieces
         self.arr_hr_pieces_test = arr_hr_pieces
         self.arr_lr_pieces_test = arr_lr_pieces
-    def reconstr_test(self,img,to_shape):
-        p2=[]
-        return p2
+    def reconstr_test(self,arr):
+        import matplotlib.pyplot as plt
+        size_arr = arr.shape
+        num_img_arr = int(size_arr[0]/self.n_pieces_img)
+        if size_arr[0]%self.n_pieces_img != 0:
+            raise Exception('No enough pieces to form images, at least',str(self.n_pieces_img))
+        ls_all_im = []
+        for i in range(0,num_img_arr):
+            ac_img = arr[i*self.n_pieces_img:i*self.n_pieces_img+self.n_pieces_img,::,::,::,::]
+            a=[]
+            for j in range(0,self.n_pieces_x):
+                ac_piece= ac_img[j*self.n_pieces_y:j*self.n_pieces_y+self.n_pieces_y,::,::,::,::].squeeze(axis=1)
+                x_cot = ac_piece[0,::,::,::]
+                for k in range(1,self.n_pieces_y):
+                    ac_s_piece = ac_piece[k,::,::,::]
+                    x_cot = np.concatenate((x_cot,ac_s_piece),axis=1)
+                if j == 0:
+                    a = x_cot
+                else:
+                    a = np.concatenate((a,x_cot),axis=0)
 
+            ls_all_im.append(a)
+        return ls_all_im
  
 
-import os
-root = os.path.join(os.getcwd(),'images')
-dataprep = Data_Preparation(root)
-import matplotlib.pyplot as plt
+# import os
+# root = os.path.join(os.getcwd(),'images')
+# dataprep = Data_Preparation(root)
+# import matplotlib.pyplot as plt
 
-hr= dataprep.arr_hr_pieces_test
-lr = dataprep.arr_lr_pieces_test
-print(hr.shape)
-fig, ax = plt.subplots(1,2)
-ax[0].imshow(hr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
-ax[1].imshow(lr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
+# hr= dataprep.arr_hr_pieces_test
+# lr = dataprep.arr_lr_pieces_test
+# print(hr.shape)
+# fig, ax = plt.subplots(1,2)
+# ax[0].imshow(hr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
+# ax[1].imshow(lr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
 
-plt.show()
+# plt.show()
 
-arr = dataprep.ls_hr_pieces_test[0]
-recon = dataprep.reconstr_test(arr,(1,1,160,256,256)).squeeze(axis=0)
-plt.figure()
-plt.imshow(recon[::,::,50,::].squeeze(axis=0))
-plt.show()
+# arr = dataprep.arr_lr_pieces_test
+# recon = dataprep.reconstr_test(arr)
+# plt.figure()
+# plt.imshow(recon[0][::,::,50])
+# plt.show()
+# plt.figure()
+# plt.imshow(recon[1][::,::,50])
+# plt.show()
 
     
     

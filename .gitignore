@@ -3,4 +3,5 @@ images/
 *.jpeg
 *.jpg
 *.png
-.vscode/
+.vscode/`
+*.pyc

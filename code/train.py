@@ -19,7 +19,7 @@ class Trainer:
         self.data_loader_train = loader_train
         self.data_loader_test = loader_test
         self.model = model
-        self.loss = nn.L1Loss()
+        self.loss = nn.MSELoss()
         self.cuda = cuda
         self.optimizer =optim.Adam(model.parameters(),lr)
         self.error_last = 1e8
@@ -43,7 +43,9 @@ class Trainer:
         ssmi_L=[]
         psnr_c = []
         ssim_c = []
-        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_train),total=len(self.data_loader_train),desc='Train epoch =%d'%self.ac_epoch,ncols=80,leave=False):
+        losses = []
+        
+        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_train),total=len(self.data_loader_train),desc='Train epoch %d'%self.ac_epoch,ncols=80,leave=False):
             psnr_c = []
             ssim_c = []
             iteration = batch_idx + self.ac_epoch*len(self.data_loader_train)
@@ -55,26 +57,29 @@ class Trainer:
             self.optimizer.zero_grad()
             score = self.model(data)
             loss = self.loss(score,target)
-
+            losses.append(loss.item())
             if np.isnan(float(loss.item())):
                 raise ValueError('loss is nan while training')
             loss.backward()
             self.optimizer.step()
             for k in range(0,self.data_loader_train.batch_size):   
-              t = target[k,::,::,::,::]  
-              s = score[k,::,::,::,::]          
+              t = target[k,::,::,::,::] 
+
+              s = score[k,::,::,::,::]   
+                  
               p,s = self.metrics(t.squeeze(),s.squeeze())
               psnr_c.append(p)
               ssim_c.append(s)
-            print('\n Epoch: ',self.ac_epoch,'\t loss:',str(loss.item()))
+            print('\n Epoch: ',self.ac_epoch,' \t loss:',str(loss.item()))
 
 
         
         
         psnr_L.append(np.mean(psnr_c))
         ssmi_L.append(np.mean(ssim_c))
-        torch.save({'epoch':self.ac_epoch,'model_state_dict': self.model.state_dict(),'model':self.model,},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
+        torch.save({'epoch':self.ac_epoch,'model_state_dict': self.model.state_dict(),'model':self.model,'losses':losses},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
         print('Mean PSNR',str(np.mean(psnr_c)))
+        print('\n Mean Loss',str(np.mean(losses)))
 
 
 
@@ -160,7 +165,7 @@ class Data_Preparation():
     def cut_test(self,size):
         x = size[0]
         y = size[1]
-        print(x)
+
      
         hr = self.test_hr_data[0]
         lr = self.test_lr_data[0]
@@ -215,10 +220,10 @@ class Data_Preparation():
             raise Exception('No enough pieces to form images, at least',str(self.n_pieces_img))
         ls_all_im = []
         for i in range(0,num_img_arr):
-            ac_img = arr[i*self.n_pieces_img:i*self.n_pieces_img+self.n_pieces_img,::,::,::,::]
+            ac_img = arr[i*self.n_pieces_img:i*self.n_pieces_img+self.n_pieces_img,::,::,::]
             a=[]
             for j in range(0,self.n_pieces_x):
-                ac_piece= ac_img[j*self.n_pieces_y:j*self.n_pieces_y+self.n_pieces_y,::,::,::,::].squeeze(axis=1)
+                ac_piece= ac_img[j*self.n_pieces_y:j*self.n_pieces_y+self.n_pieces_y,::,::,::]#.squeeze(axis=1)
                 x_cot = ac_piece[0,::,::,::]
                 for k in range(1,self.n_pieces_y):
                     ac_s_piece = ac_piece[k,::,::,::]

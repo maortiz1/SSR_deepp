@@ -5,3 +5,5 @@ images/
 *.png
 .vscode/`
 *.pyc
+*.pth.tar
+

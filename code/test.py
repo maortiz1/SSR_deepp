@@ -27,24 +27,29 @@ class Test():
 
 
     def test_all(self):
-
+        import train
         all = np.empty((len(self.loader_test),self.output[0],self.output[1],self.output[2]))
+        psnrs=[]
 
         for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_test),total=len(self.loader_test)):
             if cuda:
                 data, target = data.to(self.device), target.to(self.device)
             
             score = self.model(data)
+            t = target[0,::,::,::,::]
+            s= score[0,::,::,::,::]
+            p,s = train.metrics(t.squeeze(),s.squeeze())
 
             score_or = score.squeeze().permute(1,2,0)
 
             score_cpu = score_or.cpu().data.numpy()
-
+            psnrs.append(psnrs)
             
             all[batch_idx,::,::,::]= score_cpu
 
         self.all = all
-        
+        self.psnrs = psnrs
+        print('Mean Psnr is: ',np.mean(psnrs))
     def vis_3(self):
        import matplotlib.pyplot as plt
        print('great')

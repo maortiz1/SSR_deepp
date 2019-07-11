@@ -27,7 +27,9 @@ class Trainer:
         self.iteration = 0
         self.out_f = out
         self.device = device
-        os.mkdir(self.out_f)
+        if not(os.path.isdir(self.out_f)):                  
+           os.mkdir(self.out_f)
+        self.mean_loss_epc=[]
        
         
 
@@ -77,7 +79,9 @@ class Trainer:
         
         psnr_L.append(np.mean(psnr_c))
         ssmi_L.append(np.mean(ssim_c))
-        torch.save({'epoch':self.ac_epoch,'model_state_dict': self.model.state_dict(),'model':self.model,'losses':losses},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
+        self.mean_loss_epc.append(np.mean(losses))
+        
+        torch.save({'epoch':self.ac_epoch,'model_state_dict': self.model.state_dict(),'model':self.model,'losses':losses,'m_los':self.mean_loss_epc},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
         print('Mean PSNR',str(np.mean(psnr_c)))
         print('\n Mean Loss',str(np.mean(losses)))
 

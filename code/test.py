@@ -60,10 +60,10 @@ class Test():
 
 
 
-gpu = 3
+gpu = 2
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 torch.cuda.set_device(gpu)
-device = 'cuda:3'
+device = 'cuda:2'
 cuda = torch.cuda.is_available()
 
 root = os.path.join(os.getcwd(),'..','images')
@@ -74,7 +74,7 @@ hr_test = dataprep.arr_hr_pieces_test
 lr_test = dataprep.arr_lr_pieces_test
 testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
 testloader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
-file_r='chkpt_r_50_bt_8/che_epoch_13.pth.tar'
+file_r='chkpt_r_50_bt_8/che_epoch_237.pth.tar'
 output_size = (32,32,256)
 
 n_resblock =50

@@ -123,9 +123,11 @@ class Data_Preparation():
         all_train_hr = []
         for i,img_r in enumerate(self.gt_hr[0:tr_size]):
             img = nib.load(img_r) # read data file
+            print(img_r)
         
             data = img.get_fdata()#get data from file
             data_wh = utils.normalize_image_whitestripe(img)#normalize hr image to wh
+            print(data.shape)
 
             lr_temp = utils.downsample(data, down_factor=factor)#downsampled hr image
             lr_nib = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
@@ -150,8 +152,11 @@ class Data_Preparation():
         test_img_lr = []
         for i,img_r in enumerate(self.gt_hr[tr_size:-1]):
             img = nib.load(img_r) # read data file
+            print(img_r)
+
         
             data = img.get_fdata()#get data from file
+            print(data.shape)
             data_wh = utils.normalize_image_whitestripe(img)#normalize hr image to wh
             data_wh = np.expand_dims(data_wh.get_fdata(),axis=0)
             test_img_hr.append(data_wh)
@@ -193,6 +198,8 @@ class Data_Preparation():
         for index, value in enumerate(zip(self.test_hr_data,self.test_lr_data)):        
             hr = value[0]
             lr = value[1]
+            print(hr.shape)
+            print(lr.shape)
             pc_hr_img = np.empty((n_pieces_x*n_pieces_y,hr.shape[0],x,y,hr.shape[3]))
             pc_lr_img = np.empty((n_pieces_x*n_pieces_y,lr.shape[0],x,y,lr.shape[3]))
             ind = 0

@@ -10,7 +10,7 @@ def downsample(img,down_factor=3):
     size = math.floor(z_size/(down_factor))#size of part according to down factor
     center = round(z_size/2)-1 #center for cutting
     if size%2==0:
-        crop_ffs = shift_fft_imag[::,::,center-size/2:center+size/2]
+        crop_ffs = shift_fft_imag[::,::,int(center-(size/2)):int(center+(size/2))]
     else:
         size = size+1        
         crop_ffs = shift_fft_imag[::,::,int(center-(size/2)+1):int(center+(size/2))]

@@ -120,7 +120,7 @@ lr_test = dataprep.arr_lr_pieces_test
 testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
 testloader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
 #file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1/che_epoch_24.pth.tar'
-file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1_V2/che_epoch_473.pth.tar'
+file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1_V2/che_epoch_769.pth.tar'
 output_size = (32,32,256)
 
 n_resblock =52

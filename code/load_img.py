@@ -64,24 +64,55 @@ def downsample_onFSpace_0pad_3D(img_nib,down_factor=3):
 
 
 
-img = nib.load(os.path.join('images','T1_1.nii'))
+img = nib.load(os.path.join('..','images','T1_60.nii'))
+print(img.header['pixdim'])
 data = img.get_fdata()
-down= downsample_onFSpace_3D(data)
-plt.imshow(down[::,50,::])
-plt.title(str(down.shape))
-print(down.shape)
-plt.show()
 
-img = nib.load(os.path.join('images','T1_1.nii')).get_fdata()
-
-down=  downsample_onFSpace_0pad_3D(img)
-plt.imshow(down[::,50,::])
-plt.title(str(down.shape))
-print(down.shape)
-plt.show()
-
-plt.imshow(data[15:-16,50,::])
+plt.imshow(data[100,::,::])
 plt.title(str(data.shape))
 print(data.shape)
+plt.show()
+fig,axes = plt.subplots(1,3)
+axes[0].imshow(data[100,::,::])
+axes[1].imshow(data[::,100,::])
+axes[2].imshow(data[::,::,100])
+plt.show()
+
+
+
+
+img = nib.load(os.path.join('..','images','T1_68.nii'))
+print(img.header['pixdim'])
+data = img.get_fdata()
+
+
+
+plt.imshow(data[100,::,::])
+plt.title(str(data.shape))
+print(data.shape)
+plt.show()
+fig,axes = plt.subplots(1,3)
+axes[0].imshow(data[100,::,::])
+axes[1].imshow(data[::,100,::])
+axes[2].imshow(data[::,::,100])
+plt.show()
+
+
+
+
+img = nib.load(os.path.join('..','images','T1_96.nii'))
+print(img.header['pixdim'])
+data = img.get_fdata()
+
+
+
+plt.imshow(data[100,::,::])
+plt.title(str(data.shape))
+print(data.shape)
+plt.show()
+fig,axes = plt.subplots(1,3)
+axes[0].imshow(data[100,::,::])
+axes[1].imshow(data[::,100,::])
+axes[2].imshow(data[::,::,100])
 plt.show()
 

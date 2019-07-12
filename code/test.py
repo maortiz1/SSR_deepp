@@ -23,6 +23,7 @@ class Test():
         self.device = device
         self.vox_size=vox_size
         self.output = out_put
+     
     
         self.test_all()
 
@@ -87,6 +88,10 @@ class Test():
         psnr_c = psnr(true_img.data.cpu().numpy(),pred_img.data.cpu().numpy())
         ssim_c = ssim(true_img.data.cpu().numpy(),pred_img.data.cpu().numpy())
         return psnr_c,ssim_c
+        
+    def test_all_models(self):
+        print('not_yet')
+    
 
 
             
@@ -115,7 +120,7 @@ lr_test = dataprep.arr_lr_pieces_test
 testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
 testloader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
 #file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1/che_epoch_24.pth.tar'
-file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1/che_epoch_24.pth.tar'
+file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1_V2/che_epoch_473.pth.tar'
 output_size = (32,32,256)
 
 n_resblock =52

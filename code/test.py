@@ -104,10 +104,10 @@ class Test():
 
 
 
-gpu = 1
+gpu = 0
 os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 torch.cuda.set_device(gpu)
-device = 'cuda:1'
+device = 'cuda:0'
 cuda = torch.cuda.is_available()
 
 root = os.path.join(os.getcwd(),'..','images')

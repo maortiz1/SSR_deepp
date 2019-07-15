@@ -64,9 +64,48 @@ def normalize(img):
 
 
 
-    
+def cropall(img,vox_size):
+    import numpy as np
+    import math
 
-# import nibabel as nib
+    size_x = img.shape[0]
+    size_y = img.shape[1]
+    size_z = img.shape[2]
+    v_x = vox_size[0]
+    v_y = vox_size[1]
+
+    n_pz_x = int(np.floor(size_x/v_x))
+    n_pz_y = int(np.floor(size_y/v_x))
+    res_x = size_x - n_pz_x*v_x
+    res_y = size_y - n_pz_y*v_y
+
+    if res_x%2 == 0:
+        beg_x = int(res_x/2)
+    else:
+        beg_x = np.ceil(int(res_x/2))
+    if res_y%2 == 0:
+        beg_y = int(res_y/2)
+    else:
+        beg_y = np.ceil(int(res_y/2))
+
+ #   pcs = np.empty((n_pz_x*n_pz_y,v_x,v_y,size_z))
+    pcs = []
+    ind = 0
+    for i in range(0,n_pz_x):
+        for j in range(0,n_pz_y):
+            pz = img[beg_x*i:beg_x*i+v_x,beg_y*j:beg_y*j+v_y,::]
+            #pcs[ind,::,::,::] = pz
+            pcs.append(pz)
+            ind +=1
+    return pcs,n_pz_x,n_pz_y
+
+
+
+
+
+
+
+import nibabel as nib
 # import os
 # import numpy as np
 # import matplotlib.pyplot as plt
@@ -109,8 +148,11 @@ def normalize(img):
 # import os
 # import matplotlib.pyplot as plt
 
-
-# img = nib.load(os.path.join('images','T1_1.nii'))
+import os
+img = nib.load(os.path.join('images','T1_50.nii'))
+img = img.get_fdata()
+im_l,n_x,n_y = cropall(img,(32,32))
+print(len(im_l))
 
 # wh = normalize_image_whitestripe(img)
 # data = wh.get_fdata()

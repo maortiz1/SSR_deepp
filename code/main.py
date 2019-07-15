@@ -18,9 +18,9 @@ def main():
     n_resblock = 52
     root = os.path.join(os.getcwd(),'..','images')
     dataprep = train.Data_Preparation(root)
-    lr_train_vox = dataprep.lr_train_vox
-    hr_train_vox = dataprep.hr_train_vox
-    output_sz = hr_train_vox[1,::,::,::,::].squeeze()
+    lr_train_vox = dataprep.lr_pcs_tr
+    hr_train_vox = dataprep.hr_pcs_tr
+    output_sz = hr_train_vox[0].squeeze()
 
     trainDataset = train.Dataset(hr_train_vox,lr_train_vox,transform=image_utils.normalize)
     output_sz = (256,32,32)
@@ -31,8 +31,8 @@ def main():
     out_f = 'chkpt_r_52_bt_8_lr_0_001_res_0_1_V2'
     
 
-    lr_test = dataprep.test_lr_data
-    hr_test = dataprep.test_hr_data
+    lr_test = dataprep.lr_pcs_ts
+    hr_test = dataprep.hr_pcs_ts
     testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
     test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
     ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.1)

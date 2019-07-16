@@ -4,6 +4,7 @@ import torch
 import torch.optim.lr_scheduler as lrs
 import torch.nn as nn
 import tqdm
+from decimal import Decimal
 import numpy as np
 from skimage.measure import compare_psnr as psnr
 from skimage.measure import compare_ssim as ssim
@@ -50,8 +51,8 @@ class Trainer:
 
     def train_epoch(self):
         self.model.train()
-        lr=self.optimizer.get_lr()
-        print('Learning Rate: {:.2e}'.format(Decimal(lr)))
+        lr=self.get_lr(self.optimizer)
+        print('\n Learning Rate: {:.2e}'.format(Decimal(lr)))
 
 
         losses = []
@@ -100,6 +101,7 @@ class Trainer:
                     'm_los':self.mean_loss_epc},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
         print('\n Mean PSNR',str(np.mean(psnr_c),'\n Mean SSIM: ',str(np.mean(ssmi_L))))
         print('\n Mean Loss',str(np.mean(losses)))
+        self.optimizer.schedule()        
         with torch.no_grad():
             self.model.eval()
             loss_ts=[]
@@ -151,7 +153,9 @@ class Trainer:
         psnr_c = psnr(true_img.data.cpu().numpy(),pred_img.data.cpu().numpy())
         ssim_c = ssim(true_img.data.cpu().numpy(),pred_img.data.cpu().numpy())
         return psnr_c,ssim_c
-
+    def get_lr(self,optimizer):
+        for param_group in optimizer.param_groups:
+            return param_group['lr']
 
 
 class Data_Preparation():

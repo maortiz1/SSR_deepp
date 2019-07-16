@@ -148,11 +148,11 @@ import nibabel as nib
 # import os
 # import matplotlib.pyplot as plt
 
-import os
-img = nib.load(os.path.join('images','T1_50.nii'))
-img = img.get_fdata()
-im_l,n_x,n_y = cropall(img,(32,32))
-print(len(im_l))
+#import os
+#img = nib.load(os.path.join('images','T1_50.nii'))
+#img = img.get_fdata()
+#im_l,n_x,n_y = cropall(img,(32,32))
+#print(len(im_l))
 
 # wh = normalize_image_whitestripe(img)
 # data = wh.get_fdata()

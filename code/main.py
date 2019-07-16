@@ -28,16 +28,16 @@ def main():
     bt_size = 8
     shuffle = True
     train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
-    out_f = 'chkpt_r_52_bt_8_lr_0_001_res_0_1_V2'
+    out_f = 'chkpt_r_52_bt_8_lr_0_01_res_0_1_sch_steplr'
     
 
     lr_test = dataprep.lr_pcs_ts
     hr_test = dataprep.hr_pcs_ts
     testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
-    test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
+    test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
     ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.1)
     
-    lr = 0.001
+    lr = 0.01
     #pretrained
     if cuda:
       ResNet.to(device)

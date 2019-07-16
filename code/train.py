@@ -99,9 +99,10 @@ class Trainer:
                     'ssim':self.ssmi_L,
                     'losses':losses,
                     'm_los':self.mean_loss_epc},os.path.join(self.out_f,'che_epoch_%d.pth.tar'%(self.ac_epoch)))
-        print('\n Mean PSNR',str(np.mean(psnr_c),'\n Mean SSIM: ',str(np.mean(ssim_c))))
+        print('\n Mean PSNR',str(np.mean(psnr_c)))
+        print('\n Mean SSIM: ',str(np.mean(ssim_c)))
         print('\n Mean Loss',str(np.mean(losses)))
-        self.optimizer.schedule()        
+        self.lr_scheduler.step()       
         with torch.no_grad():
             self.model.eval()
             loss_ts=[]

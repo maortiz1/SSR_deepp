@@ -28,7 +28,7 @@ def main():
     bt_size = 9
     shuffle = True
     train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
-    out_f = 'chkpt_r_52_bt_9_lr_0_01_res_0_1_sch_steplr'
+    out_f = 'chkpt_r_52_bt_9_lr_0_001_res_0_1_sch_steplr'
     
 
     lr_test = dataprep.lr_pcs_ts
@@ -37,7 +37,7 @@ def main():
     test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
     ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.1)
     
-    lr = 0.01
+    lr = 0.001
     #pretrained
     if cuda:
       ResNet.to(device)

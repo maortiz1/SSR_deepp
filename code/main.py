@@ -25,10 +25,10 @@ def main():
     trainDataset = train.Dataset(hr_train_vox,lr_train_vox,transform=image_utils.normalize)
     output_sz = (256,32,32)
 
-    bt_size = 8
+    bt_size = 9
     shuffle = True
     train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
-    out_f = 'chkpt_r_52_bt_8_lr_0_01_res_0_1_sch_steplr'
+    out_f = 'chkpt_r_52_bt_9_lr_0_01_res_0_1_sch_steplr'
     
 
     lr_test = dataprep.lr_pcs_ts

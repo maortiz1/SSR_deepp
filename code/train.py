@@ -83,11 +83,7 @@ class Trainer:
               psnr_c.append(p)
               ssim_c.append(s)
 
- 
 
-
-        
-        
         self.psnr_L.append(np.mean(psnr_c))
         self.ssmi_L.append(np.mean(ssim_c))
         self.mean_loss_epc.append(np.mean(losses))

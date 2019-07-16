@@ -90,3 +90,4 @@ class ResNET(nn.Module):
     
 
 
+class ResNetIso():

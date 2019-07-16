@@ -129,16 +129,16 @@ class Trainer:
             mean_ssim = np.mean(ssim_ts)
             mean_loss = np.mean(loss_ts)
             if mean_psnr > self.best_psnr and mean_ssim > self.beat_ssmi:
-                self.best_model = model
+                self.best_model = self.model
                 torch.save({'epoch':self.ac_epoch,
                     'model_state_dict': self.best_model.state_dict(),
-                    'model':self.model,
+                    'model':self.best_model,
                     'psnr':self.psnr_L,
                     'ssmi':self.ssmi_L,
-                    'mean_psnr':mean_psnr,
-                    'mean_ssim':mean_ssim,
+                    'mean_psnr_val':mean_psnr,
+                    'mean_ssim_val':mean_ssim,
                     'losses':losses,
-                    'm_los':self.mean_loss_epc},os.path.join(self.out_f,'best_model.pth.tar'%(self.ac_epoch))) 
+                    'm_los':self.mean_loss_epc},os.path.join(self.out_f,'best_model.pth.tar')) 
            
             print('\n Validation PSNR: ',str(mean_psnr))
             print('\n Validation SSIM: ',str(mean_ssim))

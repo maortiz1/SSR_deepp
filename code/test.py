@@ -20,6 +20,9 @@ class Test():
         self.fileC = torch.load(self.root_M)
         model.load_state_dict(self.fileC['model_state_dict'])
         self.losses_epoc = self.fileC['m_los']
+        self.psnr = self.fileC['psnr']
+        self.ssim = self.file['ssim']
+        
         if cuda:
             model.to(device)
           
@@ -98,6 +101,20 @@ class Test():
             ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
             ax[ind,2].axis('off')
         plt.show()
+    def plot_history_loss(self):
+        import matplotlib.pyplot as plt
+
+        X = [ (2,1,2,'Loss',self.losses_epoc), (2,2,1,'PSNR',self.psnr), (2,2,2,'SSIM',self.ssim)]
+        
+        for nrows, ncols, plot_number,title,data in X:
+            ax=plt.subplot(nrows, ncols, plot_number)
+            ax.plot(data)
+            ax.title.set_text(title)
+        plt.show()
+
+            
+
+
 
 
            
@@ -113,9 +130,18 @@ class Test():
     def test_all_models(self):
         print('not_yet')
     
+# import  matplotlib.pyplot as plt
+# X = [(2,2,3), (2,2,4) , (2,1,1)  ]
+# for nrows, ncols, plot_number in X:
+#     print(nrows)
+#     print(ncols)
+#     print(plot_number)
+#     plt.subplot(nrows, ncols, plot_number)
+# plt.show()
 
 
-            
+
+
 
 
 

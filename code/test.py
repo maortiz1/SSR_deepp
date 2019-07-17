@@ -17,11 +17,12 @@ class Test():
     def __init__(self, loader_test,loader_train, file_R,cuda,device,model):
         self.loader_test = loader_test
         self.root_M = file_R
-        self.fileC = torch.load(self.root_M)
+
+        self.fileC = torch.load(self.root_M,map_location='cpu')
         model.load_state_dict(self.fileC['model_state_dict'])
         self.losses_epoc = self.fileC['m_los']
         self.psnr = self.fileC['psnr']
-        self.ssim = self.file['ssim']
+        self.ssim = self.fileC['ssim']
         
         if cuda:
             model.to(device)
@@ -48,7 +49,7 @@ class Test():
         self.targets=[]
         self.data=[]
             
-        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_test),total=len(self.loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
+        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_test),total=len(self.loader_test),ncols=80,leave=False):
 
 
             if self.cuda:
@@ -56,7 +57,8 @@ class Test():
             score = self.model(data)   
             loss = self.loss(score,target)
             loss_ts.append(loss.item())
-            for k in range(0,score.shape[0]):   
+            for k in range(0,score.shape[0]):  
+                d = data[k,::,::,::,::] 
                 t = target[k,::,::,::,::] 
 
                 s = score[k,::,::,::,::]   
@@ -65,9 +67,18 @@ class Test():
                 psnr_ts.append(p)
                 ssim_ts.append(s)
                 
-            self.data.append(data.data.cpu().numpy())  
-            self.scores.append(score.data.cpu().numpy())
-            self.targets.append(target.data.cpu().numpy())  
+            d = data.squeeze().permute(1,2,0)
+            d_cpu = d.cpu().data.numpy()
+            t = target.squeeze().permute(1,2,0)
+            t_cpu = t.cpu().data.numpy()
+            s = score.squeeze().permute(1,2,0)
+            s_cpu = s.cpu().data.numpy()
+            
+            
+            self.data.append(d_cpu)
+            
+            self.scores.append(s_cpu)
+            self.targets.append(t_cpu)  
 
         mean_psnr = np.mean(psnr_ts)
         mean_ssim = np.mean(ssim_ts)
@@ -79,28 +90,31 @@ class Test():
         print('\n Validation Loss: ',str(mean_loss)) 
         
 
-    def vis_3(self):
+    def vis_3(self,rep=10):
         import matplotlib.pyplot as plt       
-
-        ran_idx = np.random.randint(0,len(self.scores),3)
-        fig, ax = plt.subplots(3,3)
-        for ind,v in enumerate(ran_idx):
-            ax[ind,0].imshow(self.data[v][::,16,::],cmap='gray')
-            in_psnr = psnr(self.targets[v],self.data[v])
-            ax[ind,0].title.set_text('Input Data: PSNR %.2f'%(in_psnr))
-            ax[ind,0].axis('off')
-
-            ax[ind,1].imshow(self.targets[v][::,16,::],cmap='gray')
-            tt_psnr = psnr(self.targets[v],self.targets[v])
-            ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
-            ax[ind,1].axis('off')
-
-
-            ax[ind,2].imshow(self.scores[v][::,16,::],cmap='gray')
-            st_psnr = psnr(self.targets[v],self.scores[v])
-            ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
-            ax[ind,2].axis('off')
-        plt.show()
+        
+        for l in range(0,rep):
+        
+          ran_idx = np.random.randint(0,500,3)
+          print(ran_idx)
+          fig, ax = plt.subplots(3,3)
+          for ind,v in enumerate(ran_idx):
+              ax[ind,0].imshow(self.data[v][::,::,100],cmap='gray')
+  
+              ax[ind,0].title.set_text('Input Data')
+              ax[ind,0].axis('off')
+  
+              ax[ind,1].imshow(self.targets[v][::,::,62],cmap='gray')
+              tt_psnr = psnr(self.targets[v],self.targets[v])
+              ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
+              ax[ind,1].axis('off')
+  
+  
+              ax[ind,2].imshow(self.scores[v][::,::,100],cmap='gray')
+              st_psnr = psnr(self.targets[v],self.scores[v])
+              ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
+              ax[ind,2].axis('off')
+          plt.show()
     def plot_history_loss(self):
         import matplotlib.pyplot as plt
 

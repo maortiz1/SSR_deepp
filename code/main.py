@@ -58,7 +58,7 @@ if __name__=='__main__':
     parser.add_argument("-tr","--train",help="runs only train",action='store_true',dest='train')
     parser.add_argument("-m","--model",default='ResNET',help='model to use')
     parser.add_argument("-p","--pretrained",help="if model is pretrained",dest='pretrained',action='store_true')
-    parser.add_argument("-f","--file",default = "chkpt_r_52_bt_9_lr_0_001_res_0_1_sch_steplr/che_epoch_66.pth.tar",help="path where the pretrained model is for test or pretrained training")
+    parser.add_argument("-f","--file",default = "chkpt_r_52_bt_9_lr_0_001_res_0_1_sch_steplr/che_epoch_73.pth.tar",help="path where the pretrained model is for test or pretrained training")
     parser.add_argument("-o","--output_sz",default=(256,32,32),help="desire output size for training")
     arguments = parser.parse_args()
     root = os.path.join(os.getcwd(),'..','images')
@@ -71,9 +71,10 @@ if __name__=='__main__':
         file = arguments.file
 
         dataprep = train.Data_Preparation(root)
+        
 
 
-        bt_size = 9
+        bt_size = 1
         shuffle = True
         lr_train_vox = dataprep.lr_pcs_tr
         hr_train_vox = dataprep.hr_pcs_tr
@@ -87,16 +88,19 @@ if __name__=='__main__':
         test_data_loader = data.DataLoader(test_dataset,batch_size=bt_size,shuffle=False)
         
 
-        gpu = 2
+        gpu = 0
         os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
         torch.cuda.set_device(gpu)
-        device = 'cuda:2'
+        device = 'cuda:0'
         cuda = torch.cuda.is_available()
+
+
 
         if arguments.model == 'ResNET':
           ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=arguments.output_sz,res_scale=0.1)
           test = test.Test(test_data_loader,train_data_loader,file,cuda,device,ResNet)
           test.vis_3()
+          test.plot_history_loss()
   
     else:   
 

@@ -105,7 +105,7 @@ class Trainer:
             psnr_ts=[]
             ssim_ts=[]
             
-            for     ,(data,target) in tqdm.tqdm(enumerate(self.data_loader_test),total=len(self.data_loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
+            for  batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_test),total=len(self.data_loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
 
                 if self.cuda:
                     data,target = data.to(self.device),target.to(self.device)
@@ -283,7 +283,7 @@ class Dataset(data.Dataset):
         Parameters
         ----------
             index: int
-                Position of the item required
+                Position of the item
         """
         y = torch.from_numpy(np.expand_dims(self.data_hr[index],axis=0).astype(np.float32)).permute(0,3,1,2)
         x = torch.from_numpy(np.expand_dims(self.data_lr[index],axis=0).astype(np.float32)).permute(0,3,1,2)

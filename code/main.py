@@ -59,16 +59,18 @@ if __name__=='__main__':
     parser.add_argument("-m","--model",default='ResNET',help='model to use')
     parser.add_argument("-p","--pretrained",help="if model is pretrained",dest='pretrained',action='store_true')
     parser.add_argument("-f","--file",default = "chkpt_r_52_bt_9_lr_0_001_res_0_1_sch_steplr/che_epoch_66.pth.tar",help="path where the pretrained model is for test or pretrained training")
-
+    parser.add_argument("-o","--output_sz",default=(256,32,32),help="desire output size for training")
     arguments = parser.parse_args()
     root = os.path.join(os.getcwd(),'..','images')
-    dataprep = train.Data_Preparation(root)
+    print(arguments)
     n_resblock = 52
+    
     
 
     if arguments.test:
         file = arguments.file
         model = arguments.model
+        dataprep = train.Data_Preparation(root)
 
 
         bt_size = 9
@@ -92,8 +94,8 @@ if __name__=='__main__':
         cuda = torch.cuda.is_available()
 
         if arguments.model == 'ResNet':
-          ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.1)
-        test = test.Test(test_data_loader,train_data_loader,file,cuda,device,)
+          ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=arguments.output_sz,res_scale=0.1)
+          test = test.Test(test_data_loader,train_data_loader,file,cuda,device,ResNet)
         
     else:   
 

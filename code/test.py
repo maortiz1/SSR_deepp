@@ -14,7 +14,7 @@ class Test():
     """
     Class that allows testing a pretraned model
     """
-    def __init__(self, loader_test,loader_train, file_R,cuda,device,vox_size,model):
+    def __init__(self, loader_test,loader_train, file_R,cuda,device,model):
         self.loader_test = loader_test
         self.root_M = file_R
         self.fileC = torch.load(self.root_M)
@@ -25,7 +25,7 @@ class Test():
           
         self.model = model
         self.device = device
-        self.vox_size=vox_size
+  
   
         self.loss = nn.MSELoss()     
         self.loader_train = loader_train

@@ -1,6 +1,9 @@
 
 #Low resolution of image
 def downsample(img,down_factor=3):
+    """
+    Downsample image by factor entered on z-axis dimension, axis=2
+    """
     import numpy as np
     import math
     
@@ -199,24 +202,24 @@ def cropall(img,vox_size):
 # plt.imshow(vox[10,::,24,::],cmap='gray')
 # plt.show()
 
-import nibabel as nib
-import os
-import matplotlib.pyplot as plt
+# import nibabel as nib
+# import os
+# import matplotlib.pyplot as plt
 
-img = nib.load(os.path.join('images','T1_50.nii'))
-img = img.get_fdata()
-# im_l,n_x,n_y = cropall(img,(32,32))
-img_d= downsample_isotropic(img,3)
-img_d2= downsample(img,3)
-img_d3= downsample_croping(img,3)
-fig,ax = plt.subplots(3,2)
-ax[0,0].imshow(img[::,50,::],cmap='gray')
-ax[0,1].imshow(img_d[::,50,::],cmap='gray')
-ax[1,0].imshow(img[::,50,::],cmap='gray')
-ax[1,1].imshow(img_d2[::,50,::],cmap='gray')
-ax[2,0].imshow(img[::,50,::],cmap='gray')
-ax[2,1].imshow(img_d3[::,50,::],cmap='gray')
-plt.show()
+# img = nib.load(os.path.join('images','T1_50.nii'))
+# img = img.get_fdata()
+# # im_l,n_x,n_y = cropall(img,(32,32))
+# img_d= downsample_isotropic(img,3)
+# img_d2= downsample(img,3)
+# img_d3= downsample_croping(img,3)
+# fig,ax = plt.subplots(3,2)
+# ax[0,0].imshow(img[::,50,::],cmap='gray')
+# ax[0,1].imshow(img_d[::,50,::],cmap='gray')
+# ax[1,0].imshow(img[::,50,::],cmap='gray')
+# ax[1,1].imshow(img_d2[::,50,::],cmap='gray')
+# ax[2,0].imshow(img[::,50,::],cmap='gray')
+# ax[2,1].imshow(img_d3[::,50,::],cmap='gray')
+# plt.show()
 
 
 

@@ -105,7 +105,7 @@ class Trainer:
             psnr_ts=[]
             ssim_ts=[]
             
-            for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_test),total=len(self.data_loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
+            for     ,(data,target) in tqdm.tqdm(enumerate(self.data_loader_test),total=len(self.data_loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
 
                 if self.cuda:
                     data,target = data.to(self.device),target.to(self.device)
@@ -234,73 +234,57 @@ class Data_Preparation():
         self.ts_num_img = num_im
 
 
-    # def reconstr_test(self,arr):
-    #     import matplotlib.pyplot as plt
-    #     size_arr = arr.shape
-    #     num_img_arr = int(size_arr[0]/self.n_pieces_img)
-    #     if size_arr[0]%self.n_pieces_img != 0:
-    #         raise Exception('No enough pieces to form images, at least',str(self.n_pieces_img))
-    #     ls_all_im = []
-    #     for i in range(0,num_img_arr):
-    #         ac_img = arr[i*self.n_pieces_img:i*self.n_pieces_img+self.n_pieces_img,::,::,::]
-    #         a=[]
-    #         for j in range(0,self.n_pieces_x):
-    #             ac_piece= ac_img[j*self.n_pieces_y:j*self.n_pieces_y+self.n_pieces_y,::,::,::]#.squeeze(axis=1)
-    #             x_cot = ac_piece[0,::,::,::]
-    #             for k in range(1,self.n_pieces_y):
-    #                 ac_s_piece = ac_piece[k,::,::,::]
-    #                 x_cot = np.concatenate((x_cot,ac_s_piece),axis=1)
-    #             if j == 0:
-    #                 a = x_cot
-    #             else:
-    #                 a = np.concatenate((a,x_cot),axis=0)
-
-    #         ls_all_im.append(a)
-    #     return ls_all_im
- 
-
-# import os
-# root = os.path.join(os.getcwd(),'images')
-# dataprep = Data_Preparation(root)
-# all_lr = dataprep.lr_pcs_tr
-# pc = np.expand_dims(all_lr[0],axis=0).astype(np.float32)
-
-# print(pc.shape)
-# import matplotlib.pyplot as plt
-
-# hr= dataprep.arr_hr_pieces_test
-# lr = dataprep.arr_lr_pieces_test
-# print(hr.shape)
-# fig, ax = plt.subplots(1,2)
-# ax[0].imshow(hr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
-# ax[1].imshow(lr[20,::,::,20,::].squeeze(axis=0),cmap='gray')
-
-# plt.show()
-
-# arr = dataprep.arr_lr_pieces_test
-# recon = dataprep.reconstr_test(arr)
-# plt.figure()
-# plt.imshow(recon[0][::,::,50])
-# plt.show()
-# plt.figure()
-# plt.imshow(recon[1][::,::,50])
-# plt.show()
-
-    
-    
-
-
-
 
 class Dataset(data.Dataset):
+    """
+    Class that builds the representation of the dataset inputs
+    
+    ...
+    Attributes
+    ----------
+        data_hr: List
+            Contains the high resolution data on voxxel form
+        data_lr: List
+            Contains the Low resolution data on voxel form
+        transform: Function
+            Transform Function to applied to input data
+    
+    Methods
+    -------
+        __getitem__(index)
+            Returns item according to index performing if so the transformation function
+        __len__
+            Returns the len of the dataset
+        """
+
     def __init__(self,vox_hr,vox_lr,transform=None):
+        """
+        Parameters
+        ----------
+            vox_hr: List
+                The list containing voxels on high resolution
+            vox_lr: List
+                The List containing voxels on low resolution
+            transform: Function,optional
+                Function to transform data when asked for
+
+        """
         self.data_hr = vox_hr
         self.data_lr = vox_lr
         self.transform = transform
     def __len__(self):
-        'Denotes the total number of samples'
+        """
+        Denotes the total number of samples
+        """
         return len(self.data_hr)
     def __getitem__(self,index):
+        """
+        Returns the item on the index with the corresponding transformation
+        Parameters
+        ----------
+            index: int
+                Position of the item required
+        """
         y = torch.from_numpy(np.expand_dims(self.data_hr[index],axis=0).astype(np.float32)).permute(0,3,1,2)
         x = torch.from_numpy(np.expand_dims(self.data_lr[index],axis=0).astype(np.float32)).permute(0,3,1,2)
         if self.transform:

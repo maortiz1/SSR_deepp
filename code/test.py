@@ -9,8 +9,12 @@ from torch.utils import data
 import tqdm
 from skimage.measure import compare_psnr as psnr
 from skimage.measure import compare_ssim as ssim
+import torch.nn as nn
 class Test():
-    def __init__(self, loader_test, file_R,cuda,device,vox_size,out_put,model):
+    """
+    Class that allows testing a pretraned model
+    """
+    def __init__(self, loader_test,loader_train, file_R,cuda,device,vox_size,model):
         self.loader_test = loader_test
         self.root_M = file_R
         self.fileC = torch.load(self.root_M)
@@ -22,66 +26,83 @@ class Test():
         self.model = model
         self.device = device
         self.vox_size=vox_size
-        self.output = out_put
-     
-    
+  
+        self.loss = nn.MSELoss()     
+        self.loader_train = loader_train
+        self.cuda = cuda
+
+
         self.test_all()
 
 
 
     def test_all(self):
-
-        import train
-        all = np.empty((len(self.loader_test),self.output[0],self.output[1],self.output[2]))
-        all_target = np.empty((len(self.loader_test),self.output[0],self.output[1],self.output[2]))
-        all_data = np.empty((len(self.loader_test),self.output[0],self.output[1],85))
-        psnrs=[]
-
-        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_test),total=len(self.loader_test)):
-            if cuda:
-                data, target = data.to(self.device), target.to(self.device)
-         
-            score = self.model(data)
+        self.model.eval()
+        loss_ts=[]
+        psnr_ts=[]
+        ssim_ts=[]
+        self.scores = []
+        self.targets=[]
+        self.data=[]
             
-            for k in range(0,self.loader_test.batch_size):   
+        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_test),total=len(self.loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
+
+
+            if self.cuda:
+                data,target = data.to(self.device),target.to(self.device)
+            score = self.model(data)   
+            loss = self.loss(score,target)
+            loss_ts.append(loss.item())
+            for k in range(0,score.shape[0]):   
                 t = target[k,::,::,::,::] 
-    
+
                 s = score[k,::,::,::,::]   
                     
                 p,s = self.metrics(t.squeeze(),s.squeeze())
-                psnrs.append(p)           
-           
-           
-           
-            score_or = score.squeeze().permute(1,2,0)
+                psnr_ts.append(p)
+                ssim_ts.append(s)
+                
+            self.data.append(data.data.cpu().numpy())  
+            self.scores.append(score.data.cpu().numpy())
+            self.targets.append(target.data.cpu().numpy())  
 
-            score_cpu = score_or.cpu().data.numpy()
-
-            
-            all[batch_idx,::,::,::]= score_cpu
-            
-            target_or = target.squeeze().permute(1,2,0)
-
-            target_cpu = target_or.cpu().data.numpy()
-            all_target[batch_idx,::,::,::]= target_cpu
-            
-                        
-            data_or = data.squeeze().permute(1,2,0)
-
-            data_cpu = data_or.cpu().data.numpy()
-            all_data[batch_idx,::,::,::]= data_cpu
-
-
-
-        self.all = all
-        self.psnrs = psnrs
-        self.all_target = all_target
-        self.all_data = all_data
+        mean_psnr = np.mean(psnr_ts)
+        mean_ssim = np.mean(ssim_ts)
+        mean_loss = np.mean(loss_ts)
+      
         
-        print('Mean Psnr is: ',np.mean(psnrs))
+        print('\n Validation PSNR: ',str(mean_psnr))
+        print('\n Validation SSIM: ',str(mean_ssim))
+        print('\n Validation Loss: ',str(mean_loss)) 
+        
+
     def vis_3(self):
-       import matplotlib.pyplot as plt
-       print('great')
+        import matplotlib.pyplot as plt       
+
+        ran_idx = np.random.randint(0,len(self.scores),3)
+        fig, ax = plt.subplots(3,3)
+        for ind,v in enumerate(ran_idx):
+            ax[ind,0].imshow(self.data[v][::,16,::],cmap='gray')
+            in_psnr = psnr(self.targets[v],self.data[v])
+            ax[ind,0].title.set_text('Input Data: PSNR %.2f'%(in_psnr))
+            ax[ind,0].axis('off')
+
+            ax[ind,1].imshow(self.targets[v][::,16,::],cmap='gray')
+            tt_psnr = psnr(self.targets[v],self.targets[v])
+            ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
+            ax[ind,1].axis('off')
+
+
+            ax[ind,2].imshow(self.scores[v][::,16,::],cmap='gray')
+            st_psnr = psnr(self.targets[v],self.scores[v])
+            ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
+            ax[ind,2].axis('off')
+        plt.show()
+
+
+           
+
+
        
     def metrics(self,true_img,pred_img):
         
@@ -100,70 +121,6 @@ class Test():
 
 
         
-
-
-
-
-gpu = 0
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
-torch.cuda.set_device(gpu)
-device = 'cuda:0'
-cuda = torch.cuda.is_available()
-
-root = os.path.join(os.getcwd(),'..','images')
-print(root)
-bt_size = 1
-shuffle = False
-dataprep = train.Data_Preparation(root)
-hr_test = dataprep.arr_hr_pieces_test
-lr_test = dataprep.arr_lr_pieces_test
-testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
-testloader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
-#file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1/che_epoch_24.pth.tar'
-file_r='chkpt_r_52_bt_8_lr_0_001_res_0_1_V2/che_epoch_769.pth.tar'
-output_size = (32,32,256)
-
-n_resblock =52
-output_sz =[ (*(testDataset[1][1]).squeeze().size())]
-
-output_sz = (testDataset[1][1]).squeeze().size()
-ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.1)
-test = Test(testloader,file_r,cuda,device,(32,32),output_size,ResNet)
-top= test.all
-hr = test.all_target
-lr = test.all_data
-
-import matplotlib.pyplot as plt
-
-
-print(lr.shape)
-
-fig,axes = plt.subplots(3,3)
-axes[0,0].imshow(lr[50,::,15,::],cmap='gray')
-axes[0,1].imshow(hr[50,::,15,::],cmap='gray')
-axes[0,2].imshow(top[50,::,15,::],cmap='gray')
-axes[1,0].imshow(lr[51,::,15,::],cmap='gray')
-axes[1,1].imshow(hr[51,::,15,::],cmap='gray')
-axes[1,2].imshow(top[51,::,15,::],cmap='gray')
-axes[2,0].imshow(lr[52,::,15,::],cmap='gray')
-axes[2,1].imshow(hr[52,::,15,::],cmap='gray')
-axes[2,2].imshow(top[52,::,15,::],cmap='gray')
-
-
-plt.show()
-
-
-
-
-a = dataprep.reconstr_test(test.all)
-plt.imshow(a[1][::,120,::],cmap='gray')
-plt.show()
-
-
-l = test.losses_epoc
-
-plt.plot(l,'ro')
-plt.show()
 
 
 

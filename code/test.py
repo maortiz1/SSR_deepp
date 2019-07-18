@@ -14,7 +14,7 @@ class Test():
     """
     Class that allows testing a pretraned model
     """
-    def __init__(self, loader_test,loader_train, file_R,cuda,device,model):
+    def __init__(self,loader_test,loader_train, file_R,cuda,device,model):
         self.loader_test = loader_test
         self.root_M = file_R
 
@@ -95,16 +95,16 @@ class Test():
         
         for l in range(0,rep):
         
-          ran_idx = np.random.randint(0,500,3)
+          ran_idx = np.random.randint(0,len(self.scores),3)
           print(ran_idx)
           fig, ax = plt.subplots(3,3)
           for ind,v in enumerate(ran_idx):
-              ax[ind,0].imshow(self.data[v][::,::,100],cmap='gray')
+              ax[ind,0].imshow(self.data[v][::,::,34],cmap='gray')
   
               ax[ind,0].title.set_text('Input Data')
               ax[ind,0].axis('off')
   
-              ax[ind,1].imshow(self.targets[v][::,::,62],cmap='gray')
+              ax[ind,1].imshow(self.targets[v][::,::,100],cmap='gray')
               tt_psnr = psnr(self.targets[v],self.targets[v])
               ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
               ax[ind,1].axis('off')
@@ -125,7 +125,17 @@ class Test():
             ax.plot(data)
             ax.title.set_text(title)
         plt.show()
-
+    def vis(self):
+        import matplotlib.pyplot as plt
+        fig,ax = plt.subplots(1,3)
+        img_score = self.scores[19]
+        img_data = self.data[19]
+        img_target= self.targets[19]
+        ax[2].imshow(img_score[15,::,::],cmap='gray')
+        ax[1].imshow(img_data[15,::,::],cmap='gray')
+        ax[0].imshow(img_target[15,::,::],cmap='gray')
+        plt.show()
+      
             
 
 

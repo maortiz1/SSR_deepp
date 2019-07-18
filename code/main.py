@@ -101,6 +101,7 @@ if __name__=='__main__':
           test = test.Test(test_data_loader,train_data_loader,file,cuda,device,ResNet)
           test.vis_3()
           test.plot_history_loss()
+          test.vis()
   
     else:   
 

@@ -90,7 +90,7 @@ class Test():
         print('\n Validation Loss: ',str(mean_loss)) 
         
 
-    def vis_3(self,rep=10):
+    def vis_3(self,rep=3):
         import matplotlib.pyplot as plt       
         
         for l in range(0,rep):
@@ -99,18 +99,18 @@ class Test():
           print(ran_idx)
           fig, ax = plt.subplots(3,3)
           for ind,v in enumerate(ran_idx):
-              ax[ind,0].imshow(self.data[v][::,::,34],cmap='gray')
+              ax[ind,0].imshow(self.data[v][::,20,::],cmap='gray')
   
               ax[ind,0].title.set_text('Input Data')
               ax[ind,0].axis('off')
   
-              ax[ind,1].imshow(self.targets[v][::,::,100],cmap='gray')
+              ax[ind,1].imshow(self.targets[v][::,20,::],cmap='gray')
               tt_psnr = psnr(self.targets[v],self.targets[v])
               ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
               ax[ind,1].axis('off')
   
   
-              ax[ind,2].imshow(self.scores[v][::,::,100],cmap='gray')
+              ax[ind,2].imshow(self.scores[v][::,20,::],cmap='gray')
               st_psnr = psnr(self.targets[v],self.scores[v])
               ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
               ax[ind,2].axis('off')

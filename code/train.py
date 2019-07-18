@@ -27,7 +27,7 @@ class Trainer:
 
         self.optimizer =optim.Adam(model.parameters(),lr) #optimizer for training
 
-        self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=50,gamma=0.1) #step scheduler for better learning convergence
+        #self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=50,gamma=0.1) #step scheduler for better learning convergence
         self.error_last = 1e8 # ideal last error
         self.ac_epoch= epoch # actual epoch intial value 0, if pretrained value passes as parameter
         self.iteration = 0 #iteration epoch 
@@ -96,7 +96,7 @@ class Trainer:
         print('\n Mean PSNR',str(np.mean(psnr_c)))
         print('\n Mean SSIM: ',str(np.mean(ssim_c)))
         print('\n Mean Loss',str(np.mean(losses)))
-        self.lr_scheduler.step()       
+        #self.lr_scheduler.step()       
         with torch.no_grad():
             self.model.eval()
             loss_ts=[]

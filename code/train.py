@@ -290,5 +290,5 @@ class Dataset(data.Dataset):
         return x,y
 
 
-root = os.path.join(os.getcwd(),'images')
+root = os.path.join(os.getcwd(),'..','images')
 dataprep = Data_Preparation(root)

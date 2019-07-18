@@ -98,7 +98,8 @@ if __name__=='__main__':
 
         if arguments.model == 'ResNET':
           ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=arguments.output_sz,res_scale=0.1)
-          test = test.Test(test_data_loader,train_data_loader,file,cuda,device,ResNet)
+          test = test.Test(test_data_loader,train_data_loader,dataprep,file,cuda,device,ResNet)
+          
           test.vis_3()
           test.plot_history_loss()
           test.vis()

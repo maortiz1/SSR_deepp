@@ -123,6 +123,7 @@ def normalize(img):
 
 import matplotlib.pyplot as plt
 def cropall(img,vox_size=(32,32)):
+    import matplotlib.pyplot as plt
     import numpy as np
     import math
 
@@ -151,8 +152,11 @@ def cropall(img,vox_size=(32,32)):
     ind = 0
     for i in range(0,n_pz_x):
         for j in range(0,n_pz_y):
-            pz = img[beg_x*i:beg_x*i+v_x,beg_y*j:beg_y*j+v_y,::]
-
+            # print('X: [%d,%d] '%(beg_x+v_x*i,beg_x+v_x*(i+1)))
+            # print('Y: [%d,%d] '%(beg_y+v_y*j,beg_y+v_y*(j+1)))
+            pz = img[beg_x+v_x*i:beg_x+v_x*(i+1),beg_y+v_y*j:beg_y+v_y*(j+1),::]
+            # plt.imshow(pz[::,::,50])
+            # plt.show()
             #pcs[ind,::,::,::] = pz
             pcs.append(pz)
             ind +=1

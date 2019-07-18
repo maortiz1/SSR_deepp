@@ -160,9 +160,35 @@ class Data_Preparation():
             self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
         else:
             raise Exception('Root has to be a directory')
+        # self.vis_all()
         self.generate_voxels(factor,vox_size,train_size)
        # self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
         #self.cut_test(vox_size)
+
+    def vis_all(self):
+        import matplotlib.pyplot as plt
+        for i in self.gt_hr:
+            img = nib.load(i)
+            #header = img.header
+            #print(header['pixdim'])
+            img = utils.normalize_image_whitestripe(img,contrast='T1')
+            img = utils.normalize(img.get_fdata())
+            data_img = img
+            y = data_img.shape[1]
+            
+            plt.title(i)
+            image = []
+            for y in range(0,y):
+                if y == 0:
+                    image=plt.imshow(data_img[::,y,::],cmap='gray',interpolation='nearest')
+                    
+                else:
+                    image.set_data(data_img[::,y,::])
+
+                plt.pause(.1)
+                plt.draw()
+            plt.waitforbuttonpress(0)
+            
 
     def generate_voxels(self,factor=3,vox_size=(32,32),train_size=0.7):
         import nibabel as nib
@@ -178,6 +204,7 @@ class Data_Preparation():
         n_pc = []
         indx = 0
         num_im=[]
+
         for i in  tr_samples:
             img = nib.load(i)
             data_img = img.get_fdata()
@@ -192,7 +219,7 @@ class Data_Preparation():
             wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
             hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr.get_fdata(),vox_size)
             n_p_ls =[n_x_hr,n_y_hr]
-
+            
             lr_pcs += lr_pc
             hr_pcs += hr_pc
             indx +=1
@@ -202,6 +229,7 @@ class Data_Preparation():
         self.hr_pcs_tr = hr_pcs
         self.tr_cr_pcs = n_pc
         self.tr_num_img = num_im
+    
 
 
         lr_pcs = []
@@ -226,6 +254,7 @@ class Data_Preparation():
 
             lr_pcs += lr_pc
             hr_pcs += hr_pc
+            
             indx +=1
             num_im.append(indx)
             n_pc.append(n_p_ls)
@@ -233,6 +262,44 @@ class Data_Preparation():
         self.hr_pcs_ts = hr_pcs
         self.ts_cr_pcs = n_pc
         self.ts_num_img = num_im
+    def reconstruct(self,scores,type='test'):
+        all_join = []
+        np_ts = self.ts_cr_pcs
+        if type =='train':
+            np_ts=self.tr_cr_pcs
+        i=0
+        for indx, f in enumerate(np_ts):
+            x_px = f[0]
+            y_px = f[1]
+            n_pz = y_px*x_px
+            # print(f)
+            # print('[%d,%d] length: %d'%(i,i+n_pz,len(scores)))
+            a=[]
+            l_pz = scores[i:i+n_pz]
+            for j in range(0,x_px):
+                y_pz = l_pz[j*y_px:j*y_px+y_px]
+
+                cot = []
+                for k in range(0,y_px):
+                    ac = y_pz[k]
+                    # plt.imshow(ac[::,::,100])
+                    # plt.show()
+                    # print(ac.shape)
+                    if k == 0:
+                        cot = ac
+                    else:
+                        cot=np.concatenate((cot,ac),axis=1)
+
+                    # plt.imshow(cot[::,::,100])
+                    # plt.show()
+                if j == 0:
+                    a = cot
+                else:
+                    a = np.concatenate((a,cot),axis=0)
+            i=n_pz+i
+            all_join.append(a)
+        return all_join    
+    
 
 
 
@@ -294,5 +361,93 @@ class Dataset(data.Dataset):
         return x,y
 
 
-root = os.path.join(os.getcwd(),'..','images')
-dataprep = Data_Preparation(root)
+# import matplotlib.pyplot as plt
+# root = os.path.join(os.getcwd(),'images')
+# import nibabel as nib
+# # img =nib.load(os.path.join(root,'T1_1.nii'))
+# # data = img.get_fdata()
+# # plt.imshow(data[::,50,::])
+# # plt.show()
+# dataprep = Data_Preparation(root)
+# lr_tr = dataprep.hr_pcs_tr
+
+# np_l = dataprep.tr_cr_pcs
+# i = 0 
+# all_join = []
+# for indx, f in enumerate(np_l):
+#     x_px = f[0]
+#     y_px = f[1]
+#     n_pz = y_px*x_px
+#     print(f)
+#     print('[%d,%d] length: %d'%(i,i+n_pz,len(lr_tr)))
+#     a=[]
+#     l_pz = lr_tr[i:i+n_pz]
+#     for j in range(0,x_px):
+#         y_pz = l_pz[j*y_px:j*y_px+y_px]
+#         print(len(y_pz))
+#         cot = []
+#         for k in range(0,y_px):
+#             ac = y_pz[k]
+#             # plt.imshow(ac[::,::,100])
+#             # plt.show()
+#             # print(ac.shape)
+#             if k == 0:
+#                 cot = ac
+#             else:
+#                 cot=np.concatenate((cot,ac),axis=1)
+#             print(cot.shape)
+#             # plt.imshow(cot[::,::,100])
+#             # plt.show()
+#         if j == 0:
+#             a = cot
+#         else:
+#             a = np.concatenate((a,cot),axis=0)
+#     i=n_pz+i
+#     all_join.append(a)
+#     print(a.shape)
+#     plt.imshow(a[::,50,::])
+#     plt.draw()
+
+
+# for img in all_join:
+#     x = img.shape[1]
+#     gr = plt.imshow(img[::,::,100])
+#     plt.pause(.2)
+#     plt.draw()
+    
+    # for k in range(0,x):
+    #     if gr is None:
+    #         gr = plt.imshow(img[::,k,::],cmap='gray')
+    #     else: 
+    #         gr.set_data(img[::,k,::])
+    #     plt.pause(.2)
+    #     plt.draw()
+
+
+                
+
+
+
+   # def reconstr_test(self,arr):
+    #     import matplotlib.pyplot as plt
+    #     size_arr = arr.shape
+    #     num_img_arr = int(size_arr[0]/self.n_pieces_img)
+    #     if size_arr[0]%self.n_pieces_img != 0:
+    #         raise Exception('No enough pieces to form images, at least',str(self.n_pieces_img))
+    #     ls_all_im = []
+    #     for i in range(0,num_img_arr):
+    #         ac_img = arr[i*self.n_pieces_img:i*self.n_pieces_img+self.n_pieces_img,::,::,::]
+    #         a=[]
+    #         for j in range(0,self.n_pieces_x):
+    #             ac_piece= ac_img[j*self.n_pieces_y:j*self.n_pieces_y+self.n_pieces_y,::,::,::]#.squeeze(axis=1)
+    #             x_cot = ac_piece[0,::,::,::]
+    #             for k in range(1,self.n_pieces_y):
+    #                 ac_s_piece = ac_piece[k,::,::,::]
+    #                 x_cot = np.concatenate((x_cot,ac_s_piece),axis=1)
+    #             if j == 0:
+    #                 a = x_cot
+    #             else:
+    #                 a = np.concatenate((a,x_cot),axis=0)
+
+    #         ls_all_im.append(a)
+    #     return ls_all_im

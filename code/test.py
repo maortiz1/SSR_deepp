@@ -14,9 +14,10 @@ class Test():
     """
     Class that allows testing a pretraned model
     """
-    def __init__(self,loader_test,loader_train, file_R,cuda,device,model):
+    def __init__(self,loader_test,loader_train,dataprep,file_R,cuda,device,model):
         self.loader_test = loader_test
         self.root_M = file_R
+        self.dataprep=dataprep
 
         self.fileC = torch.load(self.root_M,map_location='cpu')
         model.load_state_dict(self.fileC['model_state_dict'])
@@ -37,7 +38,7 @@ class Test():
 
 
         self.test_all()
-
+        
 
 
     def test_all(self):
@@ -135,6 +136,10 @@ class Test():
         ax[1].imshow(img_data[::,15,::],cmap='gray')
         ax[0].imshow(img_target[::,15,::],cmap='gray')
         plt.show()
+    def reconstruct(self):
+        recons_test = self.dataprep.recons_test_scoreS(self.scores)
+        
+    
       
             
 

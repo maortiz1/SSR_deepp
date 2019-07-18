@@ -215,6 +215,7 @@ class Data_Preparation():
             nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
             wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
             plt.imshow(wh_norm_lr[::,17,::],cmap='gray')
+            plt.show()
             lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr.get_fdata(),vox_size)
 
             wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')

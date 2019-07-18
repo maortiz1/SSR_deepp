@@ -110,7 +110,7 @@ class Test():
               ax[ind,1].axis('off')
   
   
-              ax[ind,2].imshow(self.scores[v][::,20,::],cmap='gray')
+              ax[ind,2].imshow(self.scores[v][::,30,::],cmap='gray')
               st_psnr = psnr(self.targets[v],self.scores[v])
               ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
               ax[ind,2].axis('off')

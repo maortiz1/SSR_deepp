@@ -137,18 +137,24 @@ class Test():
         ax[1].imshow(img_data[::,15,::],cmap='gray')
         ax[0].imshow(img_target[::,15,::],cmap='gray')
         plt.show()
+        ran_idx = np.random.randint(0,len(self.recons_org),3)
+        for i,ra in enumerate(ran_idx):
+          fig, ax = plt.subplots(1,2)
+          psnr_d= psnr(self.recons_org[ra],self.recons_scores[ra])
+          ax[0].imshow(self.recons_org[ra][::,::,50],cmap='gray')
+          ax[1].imshow(self.recons_scores[ra][::,::,50],cmap='gray')
+          plt.title(('PSNR: %.2f dB')%(psnr_d))
         
-        fig, ax = plt.subplots(1,3)
-        ax[0].imshow(self.recons_org[3][::,50,::],cmap='gray')
-        ax[1].imshow(self.recons_scores[3][::,50,::],cmap='gray')
-        plt.show()
+          plt.show()
     def reconstruct(self):
         recons_test = self.dataprep.reconstruct(self.scores)
-        recons_org = self.dataprep.reconstruct(self.data)
+        recons_org = self.dataprep.reconstruct(self.targets)
         self.recons_scores = recons_test
         self.recons_org = recons_org
         
-    
+    def test_1all(self):
+        import matplotlib.pyplot as plt
+        
       
             
 

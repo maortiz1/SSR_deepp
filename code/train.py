@@ -297,6 +297,7 @@ class Data_Preparation():
                 else:
                     a = np.concatenate((a,cot),axis=0)
             i=n_pz+i
+
             all_join.append(a)
         return all_join    
     

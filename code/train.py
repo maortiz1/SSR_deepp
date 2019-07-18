@@ -288,3 +288,7 @@ class Dataset(data.Dataset):
             y = self.transform(y)
         
         return x,y
+
+
+root = os.path.join(os.getcwd(),'images')
+dataprep = Data_Preparation(root)

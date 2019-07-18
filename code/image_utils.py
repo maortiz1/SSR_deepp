@@ -158,7 +158,7 @@ def cropall(img,vox_size=(32,32)):
             ind +=1
         # plt.imshow(pz[::,::,70])
         # plt.show()   
-    print(len(pcs))
+    # print(len(pcs))
     return pcs,n_pz_x,n_pz_y
 
 

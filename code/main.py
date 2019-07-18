@@ -10,13 +10,13 @@ import test
 
 def main():
  
-    gpu = 2
+    gpu = 0
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     torch.cuda.set_device(gpu)
-    device = 'cuda:2'
+    device = 'cuda:0'
     cuda = torch.cuda.is_available()
 
-    n_resblock = 52
+    n_resblock = 10
     root = os.path.join(os.getcwd(),'..','images')
     dataprep = train.Data_Preparation(root)
     lr_train_vox = dataprep.lr_pcs_tr
@@ -26,17 +26,17 @@ def main():
     trainDataset = train.Dataset(hr_train_vox,lr_train_vox,transform=image_utils.normalize)
     output_sz = (256,32,32)
 
-    bt_size = 9
+    bt_size = 15
     shuffle = True
     train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
-    out_f = 'chkpt_r_52_bt_9_lr_0_001_res_0_1_sch'
+    out_f = 'chkpt_r_10_bt_15_lr_0_001_res_0_5_sch'
     
 
     lr_test = dataprep.lr_pcs_ts
     hr_test = dataprep.hr_pcs_ts
     testDataset = train.Dataset(hr_test,lr_test,transform=image_utils.normalize)
     test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
-    ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.1)
+    ResNet = model.ResNET(n_resblocks=n_resblock,scale=3,output_size=output_sz,res_scale=0.5)
     
     lr = 0.001
     #pretrained

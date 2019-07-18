@@ -38,6 +38,7 @@ class Test():
 
 
         self.test_all()
+        self.reconstruct()
         
 
 
@@ -129,15 +130,23 @@ class Test():
     def vis(self):
         import matplotlib.pyplot as plt
         fig,ax = plt.subplots(1,3)
-        img_score = self.scores[50]
-        img_data = self.data[50]
-        img_target= self.targets[50]
+        img_score = self.scores[65]
+        img_data = self.data[65]
+        img_target= self.targets[65]
         ax[2].imshow(img_score[::,15,::],cmap='gray')
         ax[1].imshow(img_data[::,15,::],cmap='gray')
         ax[0].imshow(img_target[::,15,::],cmap='gray')
         plt.show()
+        
+        fig, ax = plt.subplots(1,3)
+        ax[0].imshow(self.recons_org[3][::,50,::],cmap='gray')
+        ax[1].imshow(self.recons_scores[3][::,50,::],cmap='gray')
+        plt.show()
     def reconstruct(self):
-        recons_test = self.dataprep.recons_test_scoreS(self.scores)
+        recons_test = self.dataprep.reconstruct(self.scores)
+        recons_org = self.dataprep.reconstruct(self.data)
+        self.recons_scores = recons_test
+        self.recons_org = recons_org
         
     
       

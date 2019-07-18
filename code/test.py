@@ -99,12 +99,12 @@ class Test():
           print(ran_idx)
           fig, ax = plt.subplots(3,3)
           for ind,v in enumerate(ran_idx):
-              ax[ind,0].imshow(self.data[v][::,20,::],cmap='gray')
+              ax[ind,0].imshow(self.data[v][::,30,::],cmap='gray')
   
               ax[ind,0].title.set_text('Input Data')
               ax[ind,0].axis('off')
   
-              ax[ind,1].imshow(self.targets[v][::,20,::],cmap='gray')
+              ax[ind,1].imshow(self.targets[v][::,30,::],cmap='gray')
               tt_psnr = psnr(self.targets[v],self.targets[v])
               ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
               ax[ind,1].axis('off')
@@ -131,9 +131,9 @@ class Test():
         img_score = self.scores[21]
         img_data = self.data[21]
         img_target= self.targets[21]
-        ax[2].imshow(img_score[::,20,::],cmap='gray')
-        ax[1].imshow(img_data[::,20,::],cmap='gray')
-        ax[0].imshow(img_target[::,20,::],cmap='gray')
+        ax[2].imshow(img_score[::,30,::],cmap='gray')
+        ax[1].imshow(img_data[::,30,::],cmap='gray')
+        ax[0].imshow(img_target[::,30,::],cmap='gray')
         plt.show()
       
             

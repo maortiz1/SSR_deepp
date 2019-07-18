@@ -152,7 +152,7 @@ def cropall(img,vox_size):
     for i in range(0,n_pz_x):
         for j in range(0,n_pz_y):
             pz = img[beg_x*i:beg_x*i+v_x,beg_y*j:beg_y*j+v_y,::]
-            plt.imshow(pz[::,20,::])
+            plt.imshow(pz[::,15,::])
             plt.show()
             #pcs[ind,::,::,::] = pz
             pcs.append(pz)

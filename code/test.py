@@ -128,12 +128,12 @@ class Test():
     def vis(self):
         import matplotlib.pyplot as plt
         fig,ax = plt.subplots(1,3)
-        img_score = self.scores[19]
-        img_data = self.data[19]
-        img_target= self.targets[19]
-        ax[2].imshow(img_score[15,::,::],cmap='gray')
-        ax[1].imshow(img_data[15,::,::],cmap='gray')
-        ax[0].imshow(img_target[15,::,::],cmap='gray')
+        img_score = self.scores[21]
+        img_data = self.data[21]
+        img_target= self.targets[21]
+        ax[2].imshow(img_score[::,20,::],cmap='gray')
+        ax[1].imshow(img_data[::,20,::],cmap='gray')
+        ax[0].imshow(img_target[::,20,::],cmap='gray')
         plt.show()
       
             

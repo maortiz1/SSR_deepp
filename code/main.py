@@ -136,7 +136,7 @@ if __name__=='__main__':
       device = 'cuda:%s'%(arguments.cuda)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(root,downfunction=donw_f)
+      dataprep = train.Data_Preparation(arguments.images,downfunction=donw_f)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr

@@ -53,6 +53,8 @@ def main():
 
 if __name__=='__main__':
     import argparse
+    import os
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     parser = argparse.ArgumentParser()
     parser.add_argument("-t","--test",help="runs modely only on validation if model is saved",dest='test',action='store_true')
     parser.add_argument("-tr","--train",help="runs only train",action='store_true',dest='train')
@@ -61,9 +63,14 @@ if __name__=='__main__':
     parser.add_argument("-p","--pretrained",help="if model is pretrained",dest='pretrained',action='store_true')
     parser.add_argument("-f","--file",default = "chkpt_r_52_bt_9_lr_0_001_res_0_1_sch/che_epoch_2.pth.tar",help="path where the pretrained model is for test or pretrained training")
     parser.add_argument("-o","--output_sz",default=(256,32,32),help="desire output size for training")
-    parser.add_argument("-i","-images",default=os.path.join(os.getcwd(),'..','images'),help="folder that contains .nii files for training and validation (test) data")
+    parser.add_argument("-i","--images",default=os.path.join(os.getcwd(),'..','images'),help="folder that contains .nii files for training and validation (test) data")
     parser.add_argument("-nr","--n_resblock",default=52,help="Desire of number of resblocks")
-    parser.add_argument("-cu","cuda",default="2",help="if cuda available number of cuda desire to be used")
+    parser.add_argument("-cu","--cuda",default="2",help="if cuda available number of cuda desire to be used")
+    parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
+   # parser.add_argument("-af","--autof",action='store_true','')
+   # parser.add_argument("-svf","--f_safe",help="folder to safe model")
+    
+
 
 
     arguments = parser.parse_args()
@@ -111,9 +118,39 @@ if __name__=='__main__':
           test.vis()
   
     elif arguments.train:
+      mod_tr=[]
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
-        ResNet = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+        mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+      elif arguments.model == 'ResNetIso':
+        n_resblock=arguments.n_resblock
+        mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
 
-      main()
+
+      gpu = int(arguments.cuda)
+      torch.cuda.set_device(gpu)
+      device = 'cuda:%s'%(arguments.cuda)
+      cuda = torch.cuda.is_available()
+
+      dataprep = train.Data_Preparation(root)
+      #train dataset
+      lr_train_vox = dataprep.lr_pcs_tr
+      hr_train_vox = dataprep.hr_pcs_tr
+      trainDataset = train.Dataset(hr_train_vox,lr_train_vox)       
+      bt_size = 15
+      shuffle = True
+      train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
+      #tEST
+      lr_test = dataprep.lr_pcs_ts
+      hr_test = dataprep.hr_pcs_ts
+      testDataset = train.Dataset(hr_test,lr_test)
+      test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
+      out_f= '%s_lr_%s_bt_%d'%(arguments.model,str(arguments.lr).replace('.','_'),bt_size)
+
+
+
+      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,arguments.lr,out_f,device)
+      max_epoch = 1000
+      trainer.train(max_epoch)
+      

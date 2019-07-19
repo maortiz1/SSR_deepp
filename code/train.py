@@ -14,7 +14,7 @@ import os
 import math
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,sch=False,st=50,epoch=0):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,sch=True,st=50,epoch=0):
         self.scale = scale #scale_factor
         self.data_loader_train = loader_train #data loader for training dataset
         self.data_loader_test = loader_test #data loader for validation dataset
@@ -160,23 +160,24 @@ class Data_Preparation():
             self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
         else:
             raise Exception('Root has to be a directory')
-        # self.vis_all()
         self.generate_voxels(factor,vox_size,train_size,downfunction)
+        self.normalizer()
+#        self.vis_all()
        # self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
         #self.cut_test(vox_size)
 
     def vis_all(self):
         import matplotlib.pyplot as plt
-        for i in self.gt_hr:
-            img = nib.load(i)
+        for num,i in enumerate(self.hr_pcs_tr):
+            # img = nib.load(i)
             #header = img.header
             #print(header['pixdim'])
-            img = utils.normalize_image_whitestripe(img,contrast='T1')
-            img = utils.normalize(img.get_fdata())
-            data_img = img
+            # img = utils.normalize_image_whitestripe(img,contrast='T1')
+            # img = utils.normalize(img.get_fdata())
+            data_img = i
             y = data_img.shape[1]
             
-            plt.title(i)
+            plt.title(num)
             image = []
             for y in range(0,y):
                 if y == 0:
@@ -301,21 +302,39 @@ class Data_Preparation():
             all_join.append(a)
         return all_join    
 
-    def normalizr(self):
-        from sklearn import preprocessing
+    def normalizer(self):
 
-        np_lr_pcs_ts = np.asarray( self.lr_pcs_ts)
+
+        np_lr_pcs_ts = np.asarray(self.lr_pcs_ts)
+
         np_hr_pcs_ts = np.asarray(self.hr_pcs_ts)
         np_lr_pcs_tr = np.asarray(self.lr_pcs_tr)
         np_hr_pcs_tr = np.asarray(self.hr_pcs_tr)
-        norm_lr_ts = preprocessing.scale(np_lr_pcs_ts)
-        norm_hr_ts = preprocessing.scale(np_hr_pcs_ts)
-        norm_hr_tr = preprocessing.scale(np_hr_pcs_tr)
-        norm_lr_tr = preprocessing.scale(np_lr_pcs_tr)
-        self.lr_pcs_tr = norm_lr_tr
-        self.hr_pcs_tr = norm_hr_tr
-        self.lr_pcs_ts = norm_lr_ts
-        self.hr_pcs_ts = norm_hr_ts
+
+        mean_lr_ts = np_lr_pcs_ts.mean()
+        mean_hr_ts = np_hr_pcs_ts.mean()
+        mean_lr_tr = np_lr_pcs_tr.mean()
+        mean_hr_tr = np_hr_pcs_tr.mean()
+        std_hr_tr = np_hr_pcs_tr.std()
+        std_lr_tr = np_lr_pcs_tr.std()
+        std_hr_ts = np_hr_pcs_ts.std()
+        std_lr_ts = np_lr_pcs_ts.std()
+
+        norm_lr_tr = (np_lr_pcs_tr -mean_lr_tr )/std_lr_tr
+ 
+        norm_hr_tr = (np_hr_pcs_tr -mean_hr_tr )/std_hr_tr
+        norm_lr_ts = (np_lr_pcs_ts -mean_lr_ts )/std_lr_ts
+        norm_hr_ts = (np_hr_pcs_ts -mean_hr_ts )/std_hr_ts
+
+
+
+        self.lr_pcs_tr = list(norm_lr_tr)
+
+  
+        self.hr_pcs_tr =  list(norm_hr_tr)
+        self.lr_pcs_ts =  list(norm_lr_ts)
+        self.hr_pcs_ts =  list(norm_hr_ts)
+        
 
 
 
@@ -381,15 +400,16 @@ class Dataset(data.Dataset):
         return x,y
 
 
-# import matplotlib.pyplot as plt
-# root = os.path.join(os.getcwd(),'images')
-# import nibabel as nib
-# # img =nib.load(os.path.join(root,'T1_1.nii'))
-# # data = img.get_fdata()
-# # plt.imshow(data[::,50,::])
-# # plt.show()
-# dataprep = Data_Preparation(root)
-# lr_tr = dataprep.hr_pcs_tr
+import matplotlib.pyplot as plt
+root = os.path.join(os.getcwd(),'images')
+import nibabel as nib
+# img =nib.load(os.path.join(root,'T1_1.nii'))
+# data = img.get_fdata()
+# plt.imshow(data[::,50,::])
+# plt.show()
+dataprep = Data_Preparation(root)
+lr_tr = dataprep.hr_pcs_tr
+print(len(lr_tr))
 
 # np_l = dataprep.tr_cr_pcs
 # i = 0 

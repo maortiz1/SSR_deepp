@@ -14,7 +14,7 @@ import os
 import math
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,epoch=0):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,sch=False,st=50,epoch=0):
         self.scale = scale #scale_factor
         self.data_loader_train = loader_train #data loader for training dataset
         self.data_loader_test = loader_test #data loader for validation dataset
@@ -26,8 +26,8 @@ class Trainer:
     
 
         self.optimizer =optim.Adam(model.parameters(),lr) #optimizer for training
-
-        #self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=50,gamma=0.1) #step scheduler for better learning convergence
+        if sch==True:
+            self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=st,gamma=0.1) #step scheduler for better learning convergence
         self.error_last = 1e8 # ideal last error
         self.ac_epoch= epoch # actual epoch intial value 0, if pretrained value passes as parameter
         self.iteration = 0 #iteration epoch 
@@ -153,7 +153,7 @@ class Trainer:
 
 
 class Data_Preparation():
-    def __init__(self,root_hr,factor=3,vox_size=(32,32),train_size=.7,n_samples=40):
+    def __init__(self,root_hr,factor=3,vox_size=(32,32),train_size=.7,n_samples=40,downfunction=utils.downsample):
         self.root_hr = root_hr
         self.vox_size = vox_size
         if os.path.isdir(root_hr):
@@ -161,7 +161,7 @@ class Data_Preparation():
         else:
             raise Exception('Root has to be a directory')
         # self.vis_all()
-        self.generate_voxels(factor,vox_size,train_size)
+        self.generate_voxels(factor,vox_size,train_size,downfunction)
        # self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
         #self.cut_test(vox_size)
 
@@ -190,7 +190,7 @@ class Data_Preparation():
             plt.waitforbuttonpress(0)
             
 
-    def generate_voxels(self,factor=3,vox_size=(32,32),train_size=0.7):
+    def generate_voxels(self,factor=3,vox_size=(32,32),train_size=0.7,downfunction=utils.downsample):
         import nibabel as nib
         import image_utils as utils
         import matplotlib.pyplot as plt
@@ -209,7 +209,7 @@ class Data_Preparation():
             img = nib.load(i)
             data_img = img.get_fdata()
             
-            lr_temp = utils.downsample(data_img,down_factor=factor)
+            lr_temp = downfunction(data_img,down_factor=factor)
             nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
             wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
 
@@ -241,7 +241,7 @@ class Data_Preparation():
             img = nib.load(i)
             data_img = img.get_fdata()
             
-            lr_temp = utils.downsample(data_img,down_factor=factor)
+            lr_temp = downfunction(data_img,down_factor=factor)
             nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
             wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
 
@@ -300,7 +300,26 @@ class Data_Preparation():
 
             all_join.append(a)
         return all_join    
-    
+
+    def normalizr(self):
+        from sklearn import preprocessing
+
+        np_lr_pcs_ts = np.asarray( self.lr_pcs_ts)
+        np_hr_pcs_ts = np.asarray(self.hr_pcs_ts)
+        np_lr_pcs_tr = np.asarray(self.lr_pcs_tr)
+        np_hr_pcs_tr = np.asarray(self.hr_pcs_tr)
+        norm_lr_ts = preprocessing.scale(np_lr_pcs_ts)
+        norm_hr_ts = preprocessing.scale(np_hr_pcs_ts)
+        norm_hr_tr = preprocessing.scale(np_hr_pcs_tr)
+        norm_lr_tr = preprocessing.scale(np_lr_pcs_tr)
+        self.lr_pcs_tr = norm_lr_tr
+        self.hr_pcs_tr = norm_hr_tr
+        self.lr_pcs_ts = norm_lr_ts
+        self.hr_pcs_ts = norm_hr_ts
+
+
+
+
 
 
 

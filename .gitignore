@@ -3,7 +3,7 @@ images/
 *.jpeg
 *.jpg
 *.png
-.vscode/`
+.vscode/
 *.pyc
 *.pth.tar
 .vscode/

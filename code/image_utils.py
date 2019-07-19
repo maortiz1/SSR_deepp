@@ -67,7 +67,7 @@ def downsample_croping(img_nib,down_factor=3):
     import numpy as np
     import nibabel.processing as pr
     import math
-    fft_imag = np.fft.fftn(img)#n-fourier transform
+    fft_imag = np.fft.fftn(img_nib)#n-fourier transform
     shift_fft_imag = np.fft.fftshift(fft_imag)#fft shifting(zero-frequency component to the center of the spectrum)
     z_size= shift_fft_imag.shape[2]#z_dimension size for cropping
     size = math.floor(z_size/(down_factor))#size of part according to down factor

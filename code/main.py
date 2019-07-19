@@ -67,6 +67,7 @@ if __name__=='__main__':
     parser.add_argument("-nr","--n_resblock",default=52,help="Desire of number of resblocks")
     parser.add_argument("-cu","--cuda",default="2",help="if cuda available number of cuda desire to be used")
     parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
+ 
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
     
@@ -119,21 +120,23 @@ if __name__=='__main__':
   
     elif arguments.train:
       mod_tr=[]
+      donw_f=[]
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+        donw_f= image_utils.downsample
       elif arguments.model == 'ResNetIso':
         n_resblock=arguments.n_resblock
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
-
+        donw_f = image_utils.downsample_isotropic
 
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
       device = 'cuda:%s'%(arguments.cuda)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(root)
+      dataprep = train.Data_Preparation(root,downfunction=donw_f)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
@@ -147,6 +150,9 @@ if __name__=='__main__':
       testDataset = train.Dataset(hr_test,lr_test)
       test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
       out_f= '%s_lr_%s_bt_%d'%(arguments.model,str(arguments.lr).replace('.','_'),bt_size)
+
+
+
 
 
 

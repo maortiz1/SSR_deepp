@@ -89,6 +89,7 @@ class Trainer:
         
         torch.save({'epoch':self.ac_epoch,
                     'model_state_dict': self.model.state_dict(),
+                    'optim_state_dict':self.optimizer.state_dict(),
                     'psnr':self.psnr_L,
                     'ssim':self.ssmi_L,
                     'losses':losses,
@@ -126,8 +127,9 @@ class Trainer:
                 self.best_model = self.model
                 torch.save({'epoch':self.ac_epoch,
                     'model_state_dict': self.best_model.state_dict(),
+                    'optim_state_dict':self.optimizer.state_dict(),
                     'psnr':self.psnr_L,
-                    'ssmi':self.ssmi_L,
+                    'ssim':self.ssmi_L,
                     'mean_psnr_val':mean_psnr,
                     'mean_ssim_val':mean_ssim,
                     'losses':losses,

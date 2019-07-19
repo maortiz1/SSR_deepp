@@ -402,16 +402,16 @@ class Dataset(data.Dataset):
         return x,y
 
 
-import matplotlib.pyplot as plt
-root = os.path.join(os.getcwd(),'images')
-import nibabel as nib
+#import matplotlib.pyplot as plt
+#root = os.path.join(os.getcwd(),'images')
+#import nibabel as nib
 # img =nib.load(os.path.join(root,'T1_1.nii'))
 # data = img.get_fdata()
 # plt.imshow(data[::,50,::])
 # plt.show()
-dataprep = Data_Preparation(root)
-lr_tr = dataprep.hr_pcs_tr
-print(len(lr_tr))
+#dataprep = Data_Preparation(root)
+#lr_tr = dataprep.hr_pcs_tr
+#print(len(lr_tr))
 
 # np_l = dataprep.tr_cr_pcs
 # i = 0 

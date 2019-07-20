@@ -114,10 +114,10 @@ if __name__=='__main__':
         test_data_loader = data.DataLoader(test_dataset,batch_size=bt_size,shuffle=False)
         
 
-        gpu = 2
-        os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+        gpu = int(arguments.cuda)
         torch.cuda.set_device(gpu)
-        device = 'cuda:2'
+        device = 'cuda:%s'%(arguments.cuda)
+        print(device)
         cuda = torch.cuda.is_available()
 
 
@@ -148,7 +148,7 @@ if __name__=='__main__':
       device = 'cuda:%s'%(arguments.cuda)
       print(device)
       cuda = torch.cuda.is_available()
-      print(arguments.images)
+
       dataprep = train.Data_Preparation(arguments.images,downfunction=donw_f)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr

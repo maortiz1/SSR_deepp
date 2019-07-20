@@ -96,7 +96,7 @@ if __name__=='__main__':
           
         file = arguments.file
 
-        dataprep = train.Data_Preparation(root,down_f)
+        dataprep = train.Data_Preparation(root,donw_f)
         
 
 

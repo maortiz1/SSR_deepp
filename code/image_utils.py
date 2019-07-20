@@ -38,8 +38,7 @@ def normalize_image_whitestripe(img,contrast= 'T1'):
 
     # print(norm_image.max())
     norm_image= normalize(img_norm_dara)
-    print(norm_image.max())
-    print(norm_image.min())
+
     return norm_image
 def downsample_isotropic(img,down_factor=3):
     import numpy as np

@@ -2,6 +2,7 @@
 import image_utils
 import train
 import model
+import torch.transforms as t
 import torch
 from torch.utils import data
 import os
@@ -152,7 +153,7 @@ if __name__=='__main__':
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
-      trainDataset = train.Dataset(hr_train_vox,lr_train_vox)       
+      trainDataset = train.Dataset(hr_train_vox,lr_train_vox,transform =t.normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) )       
       bt_size = 5
       shuffle = True
       train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
@@ -160,7 +161,7 @@ if __name__=='__main__':
       lr_test = dataprep.lr_pcs_ts
       hr_test = dataprep.hr_pcs_ts
       testDataset = train.Dataset(hr_test,lr_test)
-      test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
+      test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False,transform =t.normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
       out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
 

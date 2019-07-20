@@ -2,7 +2,7 @@
 import image_utils
 import train
 import model
-import torch.transforms as t
+import torchvision.transforms as t
 import torch
 from torch.utils import data
 import os

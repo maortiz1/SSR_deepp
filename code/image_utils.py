@@ -26,9 +26,14 @@ def downsample(img,down_factor=3):
 
 def normalize_image_whitestripe(img,contrast= 'T1'):
     from intensity_normalization.normalize import whitestripe
-
+    
     mask = whitestripe.whitestripe(img,contrast)
     norm_image = whitestripe.whitestripe_norm(img,mask)
+    img_norm_dara= norm_image.get_fdata()
+    img_mean = img_norm_dara.mean()
+    img_std =img_norm_dara.std()
+    norm_image = (img_norm_dara-img_mean)/(img_std)
+    
     return norm_image
 def downsample_isotropic(img,down_factor=3):
     import numpy as np

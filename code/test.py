@@ -30,11 +30,12 @@ class Test():
             model.to(device)
           
         self.model = model
+        print(self.model)
         self.device = device
   
   
         self.loss = nn.MSELoss()     
-        self.loss.load_state_dict(self.fileC['optim_state_dict'])
+        
         self.cuda = cuda
 
 
@@ -53,7 +54,7 @@ class Test():
         self.data=[]
         print('Train Dataset:')
 
-        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_test),total=len(self.loader_test),ncols=80,leave=False):
+        for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_train),total=len(self.loader_train),ncols=80,leave=False):
 
 
             if self.cuda:

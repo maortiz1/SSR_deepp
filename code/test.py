@@ -200,7 +200,7 @@ class Test():
     def reconstruct(self):
         recons_test = self.dataprep.reconstruct(self.scores)
         recons_org = self.dataprep.reconstruct(self.targets)
-        recons_input= self.dataptrp.reconstruct(self.data)
+        recons_input= self.dataprep.reconstruct(self.data)
         self.recons_scores = recons_test
         self.recons_org = recons_org
         self.recons_data = recons_input

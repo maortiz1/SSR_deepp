@@ -192,8 +192,12 @@ class Test():
           fig, ax = plt.subplots(1,3)
           psnr_d= psnr(self.recons_org[ra],self.recons_scores[ra])
           ax[0].imshow(self.recons_org[ra][::,50,::],cmap='gray')
+          ax[0].axis('off')
           ax[2].imshow(self.recons_scores[ra][::,50,::],cmap='gray')
-          ax[1].imshow(self.recons_data[ra][::,50,::])
+          ax[2].axis('off')
+          ax[1].imshow(self.recons_data[ra][::,50,::],cmap='gray')
+          ax[1].axis('off')
+          
           plt.title(('PSNR: %.2f dB')%(psnr_d))
         
           plt.show()

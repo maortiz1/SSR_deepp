@@ -62,7 +62,7 @@ if __name__=='__main__':
 
     parser.add_argument("-m","--model",default='ResNET',help='model to use')
     parser.add_argument("-p","--pretrained",help="if model is pretrained",dest='pretrained',action='store_true')
-    parser.add_argument("-f","--file",default = "chkpt_r_52_bt_9_lr_0_001_res_0_1_sch/che_epoch_2.pth.tar",help="path where the pretrained model is for test or pretrained training")
+    parser.add_argument("-f","--file",default = "ResNET_lr_0_0001_bt_5_rb_50/che_epoch_13.pth.tar",help="path where the pretrained model is for test or pretrained training")
     parser.add_argument("-o","--output_sz",default=(256,32,32),help="desire output size for training")
     parser.add_argument("-i","--images",default=os.path.join(os.getcwd(),'..','images'),help="folder that contains .nii files for training and validation (test) data")
     parser.add_argument("-nr","--n_resblock",default=50,help="Desire of number of resblocks")
@@ -71,14 +71,14 @@ if __name__=='__main__':
  
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
-    
+
 
 
 
     arguments = parser.parse_args()
     root = os.path.join(os.getcwd(),'..','images')
     print(arguments)
-    n_resblock = 52
+    n_resblock = 50
     
     
 
@@ -122,13 +122,12 @@ if __name__=='__main__':
 
 
 
-        if arguments.model == 'ResNET':
-          ResNet = model.ResNET(n_resblocks=n_resblock,output_size=arguments.output_sz,res_scale=0.5)
-          test = test.Test(test_data_loader,train_data_loader,dataprep,file,cuda,device,ResNet)
-          
-          test.vis_3()
-          test.plot_history_loss()
-          test.vis()
+      
+        test = test.Test(test_data_loader,train_data_loader,dataprep,file,cuda,device,mode_tr)
+        
+        test.vis_3()
+        test.plot_history_loss()
+        test.vis()
   
     elif arguments.train:
       mode_tr=[]

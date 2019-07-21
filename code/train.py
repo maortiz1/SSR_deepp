@@ -163,8 +163,8 @@ class Data_Preparation():
         else:
             raise Exception('Root has to be a directory')
         self.generate_voxels(factor,vox_size,train_size,downfunction)
-#        self.normalizer()
-#        self.vis_all()
+
+
        # self.generate_lr_ls_vx(factor,vox_size,train_size,n_samples)
         #self.cut_test(vox_size)
 

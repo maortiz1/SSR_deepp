@@ -36,8 +36,9 @@ class Trainer:
             self.mean_loss_epc= file['m_los']
 
         if sch==True:
-            self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=st,gamma=0.1) #step scheduler for better learning convergence
+            self.lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer) #step scheduler for better learning convergence
 
+        self.sch  = True
         self.error_last = 1e8 # ideal last error
         self.ac_epoch= epoch # actual epoch intial value 0, if pretrained value passes as parameter
         self.iteration = 0 #iteration epoch 
@@ -133,6 +134,8 @@ class Trainer:
             mean_psnr = np.mean(psnr_ts)
             mean_ssim = np.mean(ssim_ts)
             mean_loss = np.mean(loss_ts)
+            if self.sch:
+                self.lr_scheduler.step(mean_loss)  
             if mean_psnr > self.best_psnr and mean_ssim > self.beat_ssmi:
                 self.best_model = self.model
                 torch.save({'epoch':self.ac_epoch,

@@ -143,13 +143,14 @@ class Test():
         
 
     def vis_3(self,rep=3):
+        from skimage.transform import resize 
         import matplotlib.pyplot as plt       
         
         for l in range(0,rep):
         
           ran_idx = np.random.randint(0,len(self.scores),3)
           print(ran_idx)
-          fig, ax = plt.subplots(3,3)
+          fig, ax = plt.subplots(3,4)
           for ind,v in enumerate(ran_idx):
               ax[ind,0].imshow(self.data[v][::,30,::],cmap='gray')
   
@@ -166,6 +167,15 @@ class Test():
               st_psnr = psnr(self.targets[v],self.scores[v])
               ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
               ax[ind,2].axis('off')
+
+              res = resize(self.data[v],output_shape=self.data[v].shape,mode='symmetric',order=3)
+              psnr2 = psnr(self.targets[v],res)
+              ax[ind,3].imshow(res[::,50,::],cmap='gray')
+              ax[ind,3].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
+              ax[ind,3].axis('off')
+
+
+
           plt.show()
     def plot_history_loss(self):
         import matplotlib.pyplot as plt
@@ -188,7 +198,7 @@ class Test():
         ax[1].imshow(img_data[::,15,::],cmap='gray')
         ax[0].imshow(img_target[::,15,::],cmap='gray')
         plt.show()
-        ran_idx = np.random.randint(0,len(self.recons_org),3)
+        ran_idx = np.random.randint(0,len(self.recons_org),4)
         for i,ra in enumerate(ran_idx):
           fig, ax = plt.subplots(2,2)
           psnr_d= psnr(self.recons_org[ra],self.recons_scores[ra])

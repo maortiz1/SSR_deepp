@@ -213,7 +213,7 @@ if __name__=='__main__':
       hr_test = dataprep.hr_pcs_ts
       testDataset = train.Dataset(hr_test,lr_test)
       test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
-      out_f= 'Pretrained_%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
+      out_f= 'Pretrained_%s_lr_%s_bt_%d_rb_sc%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
 
 

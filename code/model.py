@@ -141,9 +141,10 @@ class ResNetIso(nn.Module):
                                    .format(name))
         
 
-class Unet(nn.Module):
-    def __init__(self,kernel_size=3,depth=5,wf=6,padding=False,batch_norm=False,):
-        super(Unet,self).__init__()
+
+
+
+
 
 
 

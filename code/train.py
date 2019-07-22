@@ -14,7 +14,7 @@ import os
 import math
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,optim_state='',sch=True,st=50,epoch=0,pretrained = False):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,sch=True,st=50,epoch=0,pretrained = False,file=''):
         self.scale = scale #scale_factor
         self.data_loader_train = loader_train #data loader for training dataset
         self.data_loader_test = loader_test #data loader for validation dataset
@@ -23,11 +23,15 @@ class Trainer:
         self.cuda = cuda #if cuda available is true for gpu usage
         self.psnr_L=[] #epoch training Peak to nosie ration
         self.ssmi_L=[] #epoch training structural similarity
+        self.file = file
     
 
         self.optimizer =optim.Adam(model.parameters(),lr) #optimizer for training
         if pretrained:            
-            self.optimizer.load_state_dict(optim_state)
+            self.optimizer.load_state_dict(self.file['optim_state_dict'])
+            self.ac_epoch=file['epoch']
+            self.psnr_L=file['psnr']
+            self.ssmi_L = file['ssim']
         if sch==True:
             self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=st,gamma=0.1) #step scheduler for better learning convergence
 

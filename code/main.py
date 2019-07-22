@@ -165,7 +165,7 @@ if __name__=='__main__':
       if cuda:
         mode_tr.to(device)
 
-      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,pretrained=True,optim_state=optim_state_dic)
+      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
       max_epoch = 1000
       trainer.train(max_epoch)
 
@@ -182,7 +182,7 @@ if __name__=='__main__':
         donw_f= image_utils.downsample
         file = torch.load(arguments.file)
         mode_tr.load_state_dict(file['model_state_dict'])
-        optim_state_dic=file['optim_state_dict']
+        
         epoch_AC = file['epoch']
 
       elif arguments.model == 'ResNetIso':
@@ -191,7 +191,7 @@ if __name__=='__main__':
         donw_f = image_utils.downsample_isotropic
         file =  torch.load(arguments.file)
         mode_tr.load_state_dict(file['model_state_dict'])
-        optim_state_dic=file['optim_state_dict']
+        
         epoch_AC = file['epoch']
 
       gpu = int(arguments.cuda)
@@ -221,7 +221,7 @@ if __name__=='__main__':
       if cuda:
         mode_tr.to(device)
 
-      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,epoch=epoch_AC,pretrained=True,optim_state=optim_state_dic)
+      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,epoch=epoch_AC,pretrained=True,file=file)
       max_epoch = 1000
       trainer.train(max_epoch)
       

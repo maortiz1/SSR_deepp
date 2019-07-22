@@ -25,6 +25,7 @@ class Trainer:
         self.ssmi_L=[] #epoch training structural similarity
         self.file = file
         self.mean_loss_epc=[]
+        self.ac_epoch= epoch # actual epoch intial value 0, if pretrained value passes as parameter
     
 
         self.optimizer =optim.Adam(model.parameters(),lr) #optimizer for training
@@ -40,7 +41,6 @@ class Trainer:
 
         self.sch  = True
         self.error_last = 1e8 # ideal last error
-        self.ac_epoch= epoch # actual epoch intial value 0, if pretrained value passes as parameter
         self.iteration = 0 #iteration epoch 
         self.out_f = out #out folder for persistence values of training
         self.device = device # device for cuda if cuda available
@@ -136,6 +136,7 @@ class Trainer:
             mean_loss = np.mean(loss_ts)
             if self.sch:
                 self.lr_scheduler.step(mean_loss)  
+                print('sch')
             if mean_psnr > self.best_psnr and mean_ssim > self.beat_ssmi:
                 self.best_model = self.model
                 torch.save({'epoch':self.ac_epoch,

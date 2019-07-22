@@ -94,11 +94,11 @@ class ResNetIso(nn.Module):
     def __init__(self, n_resblocks,res_scale=1,kernel_size=3):
         super(ResNetIso,self).__init__()
         self.padding =(kernel_size//2) 
-        m_head = [nn.Conv3d(1,32,kernel_size,padding=self.padding)]
+        m_head = [nn.Conv3d(4,4,kernel_size,padding=self.padding)]
 
-        m_body = [ResBlock(32,32,self.padding,res_scale) for i in range(n_resblocks)]
+        m_body = [ResBlock(4,4,self.padding,res_scale) for i in range(n_resblocks)]
         #tail upsampling block
-        m_tail_up =[nn.Conv3d(32,16,kernel_size,self.padding),
+        m_tail_up =[nn.Conv3d(4,16,kernel_size,self.padding),
                     nn.Conv3d(16,8,kernel_size,self.padding),
                     nn.Conv3d(8,4,kernel_size,self.padding),   
                     nn.Conv3d(4,2,kernel_size,self.padding),        

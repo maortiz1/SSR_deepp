@@ -14,7 +14,7 @@ import os
 import math
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,sch=True,st=50,epoch=0):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,optim_state,sch=True,st=50,epoch=0,pretrained = False):
         self.scale = scale #scale_factor
         self.data_loader_train = loader_train #data loader for training dataset
         self.data_loader_test = loader_test #data loader for validation dataset
@@ -26,8 +26,11 @@ class Trainer:
     
 
         self.optimizer =optim.Adam(model.parameters(),lr) #optimizer for training
+        if pretrained:            
+            self.optimizer.load_state_dict(optim_state)
         if sch==True:
             self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=st,gamma=0.1) #step scheduler for better learning convergence
+
         self.error_last = 1e8 # ideal last error
         self.ac_epoch= epoch # actual epoch intial value 0, if pretrained value passes as parameter
         self.iteration = 0 #iteration epoch 

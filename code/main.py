@@ -163,6 +163,48 @@ if __name__=='__main__':
       test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
       out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
+    elif arguments.pretrained:
+      mode_tr=[]
+      donw_f=[]
+      file = []
+      optim_state_dic=[]
+      if arguments.model == 'ResNET':
+        n_resblock = arguments.n_resblock
+        out_size = arguments.output_sz
+        mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+        donw_f= image_utils.downsample
+        file = torch.load(arguments.file)
+        mode_tr.load_state_dict(file['model_state_dict'])
+        optim_state_dic=file['optim_state_dict']
+
+      elif arguments.model == 'ResNetIso':
+        n_resblock=arguments.n_resblock
+        mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
+        donw_f = image_utils.downsample_isotropic
+        file =  torch.load(arguments.file)
+        mode_tr.load_state_dict(file['model_state_dict'])
+        optim_state_dic=file['optim_state_dict']
+
+      gpu = int(arguments.cuda)
+      torch.cuda.set_device(gpu)
+      device = 'cuda:%s'%(arguments.cuda)
+      print(device)
+      cuda = torch.cuda.is_available()
+
+      dataprep = train.Data_Preparation(arguments.images,downfunction=donw_f)
+      #train dataset
+      lr_train_vox = dataprep.lr_pcs_tr
+      hr_train_vox = dataprep.hr_pcs_tr
+      trainDataset = train.Dataset(hr_train_vox,lr_train_vox )       
+      bt_size = 5
+      shuffle = True
+      train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
+      #tEST
+      lr_test = dataprep.lr_pcs_ts
+      hr_test = dataprep.hr_pcs_ts
+      testDataset = train.Dataset(hr_test,lr_test)
+      test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
+      out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
 
 
@@ -170,7 +212,7 @@ if __name__=='__main__':
       if cuda:
         mode_tr.to(device)
 
-      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
+      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,pretrained=True,optim_state=optim_state_dic)
       max_epoch = 1000
       trainer.train(max_epoch)
       

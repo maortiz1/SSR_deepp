@@ -168,7 +168,8 @@ class Test():
               ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
               ax[ind,2].axis('off')
 
-              res = resize(self.data[v],output_shape=self.data[v].shape,mode='symmetric',order=3)
+              res = resize(self.data[v],output_shape=self.targets[v].shape,mode='symmetric',order=3)
+              
               psnr2 = psnr(self.targets[v],res)
               ax[ind,3].imshow(res[::,25,::],cmap='gray')
               ax[ind,3].title.set_text('Interpolation: PSNR %.2f'%(psnr2))

@@ -14,7 +14,7 @@ import os
 import math
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,optim_state,sch=True,st=50,epoch=0,pretrained = False):
+    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,optim_state='',sch=True,st=50,epoch=0,pretrained = False):
         self.scale = scale #scale_factor
         self.data_loader_train = loader_train #data loader for training dataset
         self.data_loader_test = loader_test #data loader for validation dataset

@@ -152,25 +152,25 @@ class Test():
           print(ran_idx)
           fig, ax = plt.subplots(3,4)
           for ind,v in enumerate(ran_idx):
-              ax[ind,0].imshow(self.data[v][::,30,::],cmap='gray')
+              ax[ind,0].imshow(self.data[v][::,25,::],cmap='gray')
   
               ax[ind,0].title.set_text('Input Data')
               ax[ind,0].axis('off')
   
-              ax[ind,1].imshow(self.targets[v][::,30,::],cmap='gray')
+              ax[ind,1].imshow(self.targets[v][::,25,::],cmap='gray')
               tt_psnr = psnr(self.targets[v],self.targets[v])
               ax[ind,1].title.set_text('Target Data: PSNR %.2f'%(tt_psnr))
               ax[ind,1].axis('off')
   
   
-              ax[ind,2].imshow(self.scores[v][::,30,::],cmap='gray')
+              ax[ind,2].imshow(self.scores[v][::,25,::],cmap='gray')
               st_psnr = psnr(self.targets[v],self.scores[v])
               ax[ind,2].title.set_text('Output Data: PSNR %.2f'%(st_psnr))
               ax[ind,2].axis('off')
 
               res = resize(self.data[v],output_shape=self.data[v].shape,mode='symmetric',order=3)
               psnr2 = psnr(self.targets[v],res)
-              ax[ind,3].imshow(res[::,50,::],cmap='gray')
+              ax[ind,3].imshow(res[::,25,::],cmap='gray')
               ax[ind,3].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
               ax[ind,3].axis('off')
 

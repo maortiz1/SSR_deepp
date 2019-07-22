@@ -201,7 +201,7 @@ class Test():
           ax[1,0].imshow(self.recons_data[ra][::,50,::],cmap='gray')
           ax[1,0].axis('off')
           ax[1,0].title.set_text('Input Data')
-          res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,order = 3, mode ='symetric')
+          res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,mode='symmetric',order=3)
           psnr2 = psnr(self.recons_org[ra],res)
           ax[1,1].imshow(res[::,50,::],cmap='gray')
           ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))

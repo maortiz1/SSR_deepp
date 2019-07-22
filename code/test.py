@@ -178,6 +178,7 @@ class Test():
             ax.title.set_text(title)
         plt.show()
     def vis(self):
+        from skimage.transform import resize        
         import matplotlib.pyplot as plt
         fig,ax = plt.subplots(1,3)
         img_score = self.scores[65]
@@ -189,16 +190,25 @@ class Test():
         plt.show()
         ran_idx = np.random.randint(0,len(self.recons_org),3)
         for i,ra in enumerate(ran_idx):
-          fig, ax = plt.subplots(1,3)
+          fig, ax = plt.subplots(2,2)
           psnr_d= psnr(self.recons_org[ra],self.recons_scores[ra])
-          ax[0].imshow(self.recons_org[ra][::,50,::],cmap='gray')
-          ax[0].axis('off')
-          ax[2].imshow(self.recons_scores[ra][::,50,::],cmap='gray')
-          ax[2].axis('off')
-          ax[1].imshow(self.recons_data[ra][::,50,::],cmap='gray')
-          ax[1].axis('off')
+          ax[0,0].imshow(self.recons_org[ra][::,50,::],cmap='gray')
+          ax[0,0].axis('off')
+          ax[0,0].title.set_text('Expected Output')
+          ax[0,1].imshow(self.recons_scores[ra][::,50,::],cmap='gray')
+          ax[0,1].axis('off')
+          ax[0,1].title.set_text(('Output ResNet PSNR: %.2f dB')%(psnr_d))
+          ax[1,0].imshow(self.recons_data[ra][::,50,::],cmap='gray')
+          ax[1,0].axis('off')
+          ax[1,0].title.set_text('Input Data')
+          res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,order = 3, mode ='symetric')
+          psnr2 = psnr(self.recons_org[ra],res)
+          ax[1,1].imshow(res[::,50,::],cmap='gray')
+          ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
+          ax[1,1].axis('off')
           
-          plt.title(('PSNR: %.2f dB')%(psnr_d))
+          
+          
         
           plt.show()
     def reconstruct(self):

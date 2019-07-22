@@ -33,7 +33,7 @@ class Trainer:
             self.ac_epoch=file['epoch']
             self.psnr_L=file['psnr']
             self.ssmi_L = file['ssim']
-           self.mean_loss_epc= file['m_los']
+            self.mean_loss_epc= file['m_los']
 
         if sch==True:
             self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=st,gamma=0.1) #step scheduler for better learning convergence

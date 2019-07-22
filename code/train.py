@@ -24,6 +24,7 @@ class Trainer:
         self.psnr_L=[] #epoch training Peak to nosie ration
         self.ssmi_L=[] #epoch training structural similarity
         self.file = file
+        self.mean_loss_epc=[]
     
 
         self.optimizer =optim.Adam(model.parameters(),lr) #optimizer for training
@@ -32,6 +33,8 @@ class Trainer:
             self.ac_epoch=file['epoch']
             self.psnr_L=file['psnr']
             self.ssmi_L = file['ssim']
+           self.mean_loss_epc= file['m_los']
+
         if sch==True:
             self.lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer,step_size=st,gamma=0.1) #step scheduler for better learning convergence
 
@@ -45,7 +48,7 @@ class Trainer:
         self.best_model = [] # best model according to psnr validation results
         if not(os.path.isdir(self.out_f)):                  
            os.mkdir(self.out_f)
-        self.mean_loss_epc=[] # mean losses per epochs
+         # mean losses per epochs
        
         
 

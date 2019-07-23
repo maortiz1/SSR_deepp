@@ -86,7 +86,7 @@ class Unet3D(nn.Module):
 
 class Block_Contracting(nn.Module):
     def __init__(self,padding,in_channels,out_channels,kernel_size=3):
-        super(Block_Contracting,self)
+        super(Block_Contracting,self).__init__()
         conv1 = nn.Conv3d(in_channels,out_channels,kernel_size,padding=padding)
         bn = nn.BatchNorm3d(out_channels)
         relu = nn.LeakyReLU()
@@ -98,7 +98,7 @@ class Block_Contracting(nn.Module):
 
 class Block_Expansive(nn.Module):
     def __init__(self,padding,in_channels,out_channels,kernel_size=2,stride=2):
-        super(Block_Expansive,self)
+        super(Block_Expansive,self).__init__()
         conv1 = nn.ConvTranspose3d(in_channels,out_channels,kernel_size,padding=padding,stride=stride)
         bn = nn.BatchNorm3d(out_channels)
         relu = nn.LeakyReLU()

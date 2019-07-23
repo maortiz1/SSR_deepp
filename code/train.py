@@ -241,8 +241,8 @@ class Data_Preparation():
                 lr_pcs += lr_pc
                 hr_pcs += hr_pc
             else:
-                lr_pc.append(wh_norm_lr)
-                hr_pc.append(wh_norm_hr)
+                lr_pcs.append(wh_norm_lr)
+                hr_pcs.append(wh_norm_hr)
             
             indx +=1
             num_im.append(indx)
@@ -277,8 +277,8 @@ class Data_Preparation():
                 lr_pcs += lr_pc
                 hr_pcs += hr_pc
             else:
-                lr_pc.append(wh_norm_lr)
-                hr_pc.append(wh_norm_hr)
+                lr_pcs.append(wh_norm_lr)
+                hr_pcs.append(wh_norm_hr)
 
             indx +=1
             num_im.append(indx)

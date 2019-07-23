@@ -146,6 +146,7 @@ if __name__=='__main__':
         donw_f = image_utils.downsample_isotropic
       elif arguments.model == 'unet3D':
         mode_tr = unet.Unet3D()
+        print('in')
         down_f = image_utils.downsample_isotropic
         crop = False
 

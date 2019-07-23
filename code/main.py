@@ -172,6 +172,9 @@ if __name__=='__main__':
       out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
       if cuda:
         mode_tr.to(device)
+      from torchsummary import summary
+      summary(mode_tr,lr_test[0])
+
 
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
       max_epoch = 1000

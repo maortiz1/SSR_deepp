@@ -8,6 +8,7 @@ import torch
 from torch.utils import data
 import os
 import test
+import numpy as np
 
 
 def main():
@@ -173,7 +174,8 @@ if __name__=='__main__':
       if cuda:
         mode_tr.to(device)
       from torchsummary import summary
-      summary(mode_tr,lr_test[0])
+
+      summary(mode_tr,np.expand_dims(lr_train_vox[0],axis=0).shape)
 
 
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)

@@ -282,7 +282,7 @@ class Data_Preparation():
 
             indx +=1
             num_im.append(indx)
-            n_pc.append(n_p_ls)
+
         self.lr_pcs_ts = lr_pcs
         self.hr_pcs_ts = hr_pcs
         self.ts_cr_pcs = n_pc

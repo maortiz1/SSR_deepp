@@ -169,9 +169,10 @@ class Trainer:
 
 
 class Data_Preparation():
-    def __init__(self,root_hr,factor=3,vox_size=(32,32),train_size=.7,n_samples=40,downfunction=utils.downsample):
+    def __init__(self,root_hr,crop=True,factor=3,vox_size=(32,32),train_size=.7,n_samples=40,downfunction=utils.downsample):
         self.root_hr = root_hr
         self.vox_size = vox_size
+        self.crop = crop
         if os.path.isdir(root_hr):
             self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
         else:
@@ -229,19 +230,22 @@ class Data_Preparation():
             lr_temp = downfunction(data_img,down_factor=factor)
             nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
             wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
-
-            lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-
+      
 
             wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-            hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-            n_p_ls =[n_x_hr,n_y_hr]
+            if self.crop:
+                lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                n_p_ls =[n_x_hr,n_y_hr]
+                n_pc.append(n_p_ls)
+                lr_pcs += lr_pc
+                hr_pcs += hr_pc
+            else:
+                lr_pc.append(wh_norm_lr)
+                hr_pc.append(wh_norm_hr)
             
-            lr_pcs += lr_pc
-            hr_pcs += hr_pc
             indx +=1
             num_im.append(indx)
-            n_pc.append(n_p_ls)
         self.lr_pcs_tr = lr_pcs
         self.hr_pcs_tr = hr_pcs
         self.tr_cr_pcs = n_pc
@@ -264,15 +268,18 @@ class Data_Preparation():
 
 
 
-            lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-
             wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-            hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-            n_p_ls =[n_x_hr,n_y_hr]
+            if self.crop:
+                lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                n_p_ls =[n_x_hr,n_y_hr]
+                n_pc.append(n_p_ls)
+                lr_pcs += lr_pc
+                hr_pcs += hr_pc
+            else:
+                lr_pc.append(wh_norm_lr)
+                hr_pc.append(wh_norm_hr)
 
-            lr_pcs += lr_pc
-            hr_pcs += hr_pc
-            
             indx +=1
             num_im.append(indx)
             n_pc.append(n_p_ls)
@@ -319,39 +326,7 @@ class Data_Preparation():
             all_join.append(a)
         return all_join    
 
-    def normalizer(self):
 
-
-        np_lr_pcs_ts = np.asarray(self.lr_pcs_ts)
-
-        np_hr_pcs_ts = np.asarray(self.hr_pcs_ts)
-        np_lr_pcs_tr = np.asarray(self.lr_pcs_tr)
-        np_hr_pcs_tr = np.asarray(self.hr_pcs_tr)
-
-        mean_lr_ts = np_lr_pcs_ts.mean()
-        mean_hr_ts = np_hr_pcs_ts.mean()
-        mean_lr_tr = np_lr_pcs_tr.mean()
-        mean_hr_tr = np_hr_pcs_tr.mean()
-        std_hr_tr = np_hr_pcs_tr.std()
-        std_lr_tr = np_lr_pcs_tr.std()
-        std_hr_ts = np_hr_pcs_ts.std()
-        std_lr_ts = np_lr_pcs_ts.std()
-
-        norm_lr_tr = (np_lr_pcs_tr -mean_lr_tr )/std_lr_tr
- 
-        norm_hr_tr = (np_hr_pcs_tr -mean_hr_tr )/std_hr_tr
-        norm_lr_ts = (np_lr_pcs_ts -mean_lr_ts )/std_lr_ts
-        norm_hr_ts = (np_hr_pcs_ts -mean_hr_ts )/std_hr_ts
-
-
-
-        self.lr_pcs_tr = list(norm_lr_tr)
-
-  
-        self.hr_pcs_tr =  list(norm_hr_tr)
-        self.lr_pcs_ts =  list(norm_lr_ts)
-        self.hr_pcs_ts =  list(norm_hr_ts)
-        
 
 
 

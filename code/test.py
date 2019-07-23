@@ -14,12 +14,12 @@ class Test():
     """
     Class that allows testing a pretraned model
     """
-    def __init__(self,loader_test,loader_train,dataprep,file_R,cuda,device,model):
+    def __init__(self,loader_test,loader_train,dataprep,file_R,cuda,device,model,crop=True):
         self.loader_test = loader_test
         self.loader_train=loader_train
         self.root_M = file_R
         self.dataprep=dataprep
-
+        self.crop = crop
         self.fileC = torch.load(self.root_M,map_location='cpu')
         model.load_state_dict(self.fileC['model_state_dict'])
         self.losses_epoc = self.fileC['m_los']
@@ -40,60 +40,14 @@ class Test():
 
 
         self.test_all()
-        self.reconstruct()
+        if self.crop:
+            self.reconstruct()
         
 
 
     def test_all(self):
         self.model.eval()
-        loss_ts=[]
-        psnr_ts=[]
-        ssim_ts=[]
-        self.scores = []
-        self.targets=[]
-        self.data=[]
-        # print('Train Dataset:')
 
-        # for batch_idx,(data,target) in tqdm.tqdm(enumerate(self.loader_train),total=len(self.loader_train),ncols=80,leave=False):
-
-
-        #     if self.cuda:
-        #         data,target = data.to(self.device),target.to(self.device)
-        #     score = self.model(data)   
-        #     loss = self.loss(score,target)
-        #     loss_ts.append(loss.item())
-        #     for k in range(0,score.shape[0]):  
-        #         d = data[k,::,::,::,::] 
-        #         t = target[k,::,::,::,::] 
-
-        #         s = score[k,::,::,::,::]   
-                    
-        #         p,s = self.metrics(t.squeeze(),s.squeeze())
-        #         psnr_ts.append(p)
-        #         ssim_ts.append(s)
-                
-        #     d = data.squeeze().permute(1,2,0)
-        #     d_cpu = d.cpu().data.numpy()
-        #     t = target.squeeze().permute(1,2,0)
-        #     t_cpu = t.cpu().data.numpy()
-        #     s = score.squeeze().permute(1,2,0)
-        #     s_cpu = s.cpu().data.numpy()
-            
-            
-        #     self.data.append(d_cpu)
-            
-        #     self.scores.append(s_cpu)
-        #     self.targets.append(t_cpu)  
-
-        # mean_psnr = np.mean(psnr_ts)
-        # mean_ssim = np.mean(ssim_ts)
-        # mean_loss = np.mean(loss_ts)
-      
-        
-        # print('\n Training PSNR: ',str(mean_psnr))
-        # print('\n Training SSIM: ',str(mean_ssim))
-        # print('\n Training Loss: ',str(mean_loss)) 
-        
         loss_ts=[]
         psnr_ts=[]
         ssim_ts=[]

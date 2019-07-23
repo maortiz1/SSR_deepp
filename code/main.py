@@ -133,6 +133,7 @@ if __name__=='__main__':
     elif arguments.train:
       mode_tr=[]
       donw_f=[]
+      crop = True
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
@@ -145,6 +146,7 @@ if __name__=='__main__':
       elif arguments.model == 'unet3D':
         mode_tr = unet.Unet3D()
         down_f = image_utils.downsample_isotropic
+        crop = False
 
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
@@ -152,7 +154,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,downfunction=donw_f)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=donw_f)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr

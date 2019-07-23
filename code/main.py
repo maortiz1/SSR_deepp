@@ -133,17 +133,17 @@ if __name__=='__main__':
   
     elif arguments.train:
       mode_tr=[]
-      donw_f=[]
+      down_f=[]
       crop = True
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
-        donw_f= image_utils.downsample
+        down_f= image_utils.downsample
       elif arguments.model == 'ResNetIso':
         n_resblock=arguments.n_resblock
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
-        donw_f = image_utils.downsample_isotropic
+        down_f = image_utils.downsample_isotropic
       elif arguments.model == 'unet3D':
         mode_tr = unet.Unet3D()
         print('in')
@@ -156,7 +156,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=donw_f)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
@@ -179,7 +179,7 @@ if __name__=='__main__':
 
     elif arguments.pretrained:
       mode_tr=[]
-      donw_f=[]
+      down_f=[]
       file = []
       epoch_AC=[]
       optim_state_dic=[]
@@ -187,7 +187,7 @@ if __name__=='__main__':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
-        donw_f= image_utils.downsample
+        down_f= image_utils.downsample
         file = torch.load(arguments.file)
         mode_tr.load_state_dict(file['model_state_dict'])
         
@@ -196,7 +196,7 @@ if __name__=='__main__':
       elif arguments.model == 'ResNetIso':
         n_resblock=arguments.n_resblock
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
-        donw_f = image_utils.downsample_isotropic
+        down_f = image_utils.downsample_isotropic
         file =  torch.load(arguments.file)
         mode_tr.load_state_dict(file['model_state_dict'])
         

@@ -2,6 +2,7 @@
 import image_utils
 import train
 import model
+import unet
 import torchvision.transforms as t
 import torch
 from torch.utils import data
@@ -141,6 +142,9 @@ if __name__=='__main__':
         n_resblock=arguments.n_resblock
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
         donw_f = image_utils.downsample_isotropic
+      elif arguments.model == 'unet3D':
+        mode_tr = unet.Unet3D()
+        down_f = image_utils.downsample_isotropic
 
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)

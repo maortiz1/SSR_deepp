@@ -69,6 +69,7 @@ if __name__=='__main__':
     parser.add_argument("-nr","--n_resblock",default=50,help="Desire of number of resblocks")
     parser.add_argument("-cu","--cuda",default="2",help="if cuda available number of cuda desire to be used")
     parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
+    parser.add_argument("-bt","--batch_size",default=1,help="Batch size for -bt ")
  
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
@@ -159,7 +160,7 @@ if __name__=='__main__':
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
       trainDataset = train.Dataset(hr_train_vox,lr_train_vox )       
-      bt_size = 5
+      bt_size = int(arguments.batch_size)
       shuffle = True
       train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
       #tEST

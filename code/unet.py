@@ -121,7 +121,7 @@ class Unet3D(nn.Module):
 
         cb10 = self.cb10(cb9)
         print('cb10: ',cb10.shape)
-        cb11= self.cb11(cb10.shape)
+        cb11= self.cb11(cb10)
         print('cb11: ',cb11.shape)
         return cb11
 

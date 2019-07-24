@@ -71,7 +71,7 @@ if __name__=='__main__':
     parser.add_argument("-cu","--cuda",default="2",help="if cuda available number of cuda desire to be used")
     parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
     parser.add_argument("-bt","--batch_size",default=1,help="Batch size for -bt ")
- 
+
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
 
@@ -86,36 +86,27 @@ if __name__=='__main__':
     
 
     if arguments.test:
-        donw_f=[]
+        mode_tr=[]
+        down_f=[]
+        crop = True
+        vox_size=[]
         if arguments.model == 'ResNET':
           n_resblock = arguments.n_resblock
           out_size = arguments.output_sz
           mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
-          donw_f= image_utils.downsample
+          down_f= image_utils.downsample
+          vox_size = (32,32)
         elif arguments.model == 'ResNetIso':
           n_resblock=arguments.n_resblock
           mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
-          donw_f = image_utils.downsample_isotropic
-          
-        file = arguments.file
-
-        dataprep = train.Data_Preparation(root,downfunction=donw_f)
-        
-
-
-        bt_size = 1
-        shuffle = True
-        lr_train_vox = dataprep.lr_pcs_tr
-        hr_train_vox = dataprep.hr_pcs_tr
-        trainDataset = train.Dataset(hr_train_vox,lr_train_vox)
-        train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
-
-
-        lr_test = dataprep.lr_pcs_ts
-        hr_test = dataprep.hr_pcs_ts
-        test_dataset = train.Dataset(hr_test,lr_test)
-        test_data_loader = data.DataLoader(test_dataset,batch_size=bt_size,shuffle=False)
-        
+          down_f = image_utils.downsample_isotropic
+          vox_size = (32,32)
+        elif arguments.model == 'unet3D':
+          mode_tr = unet.Unet3D()
+          print('in')
+          down_f = image_utils.downsample_isotropic
+          crop = True
+          vox_size = (64,64)
 
         gpu = int(arguments.cuda)
         torch.cuda.set_device(gpu)
@@ -123,8 +114,20 @@ if __name__=='__main__':
         print(device)
         cuda = torch.cuda.is_available()
 
-
-
+        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size)
+        #train dataset
+        lr_train_vox = dataprep.lr_pcs_tr
+        hr_train_vox = dataprep.hr_pcs_tr
+        trainDataset = train.Dataset(hr_train_vox,lr_train_vox )       
+        bt_size = int(arguments.batch_size)
+        shuffle = True
+        train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
+        #tEST
+        lr_test = dataprep.lr_pcs_ts
+        hr_test = dataprep.hr_pcs_ts
+        testDataset = train.Dataset(hr_test,lr_test)
+        test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
+        file = arguments.file
       
         test = test.Test(test_data_loader,train_data_loader,dataprep,file,cuda,device,mode_tr)
         

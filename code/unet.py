@@ -15,7 +15,7 @@ class Unet3D(nn.Module):
         self.cb0 = Block_Contracting(self.padding,in_channels,16,kernel_size=kernel_size)
        
         self.cb1 = Block_Contracting(self.padding,16,32,kernel_size=kernel_size)
-        self.pooling1 = nn.MaxPool3d(kernel_size=(2, 2, 2),padding= self.padding2,stride=2)
+        self.pooling1 = nn.MaxPool3d(kernel_size=(2, 2, 2),stride=2,padding= self.padding2)
       
         self.cb2 = Block_Contracting(self.padding,32,64,kernel_size=kernel_size)
         self.pooling2 = nn.MaxPool3d(kernel_size=(2, 2, 2),stride=2,padding= self.padding2)
@@ -40,7 +40,7 @@ class Unet3D(nn.Module):
         self.eb3 = Block_Expansive(self.padding2,128,128)
         self.cb8 = Block_Contracting(self.padding,128+64,64,kernel_size=kernel_size)
 
-        self.eb4 = Block_Expansive(self.padding2,64,64)
+        self.eb4 = Block_Expansive(self.padding2,64,64,kernel_size=2)
         self.cb9 = Block_Contracting(self.padding,64+32,32,kernel_size=kernel_size)
 
         self.cb10 = Block_Contracting(self.padding,16+32,16,kernel_size=kernel_size)
@@ -89,7 +89,7 @@ class Unet3D(nn.Module):
         print('cb6: ',cb6.shape)
 
         eb2 = self.eb2(cb6)
-        print('eb2": ',eb2.shape)
+        print('eb2: ',eb2.shape)
 
         eb2 = torch.cat((eb2,cb3),1)
         print('cat eb2": ',eb2.shape)
@@ -108,7 +108,7 @@ class Unet3D(nn.Module):
         print('cb8: ',cb8.shape)
 
         eb4 = self.eb4(cb8)
-        print('eb4": ',eb4.shape)
+        print('eb4: ',eb4.shape)
 
         eb4 = torch.cat((eb4,cb1),1)
         print('eb4 cat : ',eb4.shape)

@@ -37,7 +37,7 @@ class Trainer:
             self.mean_loss_epc= file['m_los']
 
         if sch==True:
-            self.lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,patience=5) #step scheduler for better learning convergence
+            self.lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,patience=10) #step scheduler for better learning convergence
 
         self.sch  = True
         self.error_last = 1e8 # ideal last error

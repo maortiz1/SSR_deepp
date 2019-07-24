@@ -110,7 +110,7 @@ class Block_Contracting(nn.Module):
         
 
 class Block_Expansive(nn.Module):
-    def __init__(self,padding,in_channels,out_channels,kernel_size=3,stride=(2,2,2):
+    def __init__(self,padding,in_channels,out_channels,kernel_size=3,stride=(2,2,2)):
         super(Block_Expansive,self).__init__()
         conv1 = nn.ConvTranspose3d(in_channels,out_channels,kernel_size,padding=padding,stride=stride)
         bn = nn.BatchNorm3d(out_channels)

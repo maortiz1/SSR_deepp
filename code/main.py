@@ -178,7 +178,7 @@ if __name__=='__main__':
       from torchsummary import summary
       if cuda:
         mode_tr.to(device)
-      summary(mode_tr,np.expand_dims(lr_train_vox[0],axis=0).shape,device='cpu')
+      summary(mode_tr,np.expand_dims(lr_train_vox[0],axis=0).shape)
 
 
 

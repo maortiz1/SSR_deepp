@@ -171,10 +171,10 @@ if __name__=='__main__':
       testDataset = train.Dataset(hr_test,lr_test)
       test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
       out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
-      from torchsummary import summary
+      
       if cuda:
         mode_tr.to(device)
-      summary(mode_tr,np.expand_dims(lr_train_vox[0],axis=0).shape)
+      
 
 
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)

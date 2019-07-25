@@ -174,7 +174,24 @@ class Test():
           ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
           ax[1,1].axis('off')
           
-          
+        for i,ra in enumerate(ran_idx):
+          fig, ax = plt.subplots(2,2)
+          psnr_d= psnr(self.recons_org[ra],self.recons_scores[ra])
+          ax[0,0].imshow(self.recons_org[ra][::,::,50],cmap='gray')
+          ax[0,0].axis('off')
+          ax[0,0].title.set_text('Expected Output')
+          ax[0,1].imshow(self.recons_scores[ra][::,::,50],cmap='gray')
+          ax[0,1].axis('off')
+          ax[0,1].title.set_text(('Output ResNet PSNR: %.2f dB')%(psnr_d))
+          ax[1,0].imshow(self.recons_data[ra][::,::,50],cmap='gray')
+          ax[1,0].axis('off')
+          ax[1,0].title.set_text('Input Data')
+          res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,mode='symmetric',order=3)
+          psnr2 = psnr(self.recons_org[ra],res)
+          ax[1,1].imshow(res[::,::,50],cmap='gray')
+          ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
+          ax[1,1].axis('off')
+                   
           
         
           plt.show()

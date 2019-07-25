@@ -128,7 +128,8 @@ if __name__=='__main__':
         testDataset = train.Dataset(hr_test,lr_test)
         test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
         file = arguments.file
-      
+        
+        
         test = test.Test(test_data_loader,train_data_loader,dataprep,file,cuda,device,mode_tr)
         
         test.vis_3()

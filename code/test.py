@@ -28,6 +28,8 @@ class Test():
         
         if cuda:
             model.to(device)
+            from torchsummary import summary
+            summary(model,input_size=(1,1,256,64,64))
           
         self.model = model
         print(self.model)

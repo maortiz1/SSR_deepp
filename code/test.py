@@ -32,7 +32,7 @@ class Test():
             summary(model,input_size=(1,256,64,64))
           
         self.model = model
-        print(self.model)
+
         self.device = device
   
   

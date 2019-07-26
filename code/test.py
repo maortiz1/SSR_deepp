@@ -105,7 +105,7 @@ class Test():
         for l in range(0,rep):
         
           ran_idx = np.random.randint(0,len(self.scores),3)
-          print(ran_idx)
+
           fig, ax = plt.subplots(3,4)
           for ind,v in enumerate(ran_idx):
               ax[ind,0].imshow(self.data[v][::,25,::],cmap='gray')
@@ -171,7 +171,8 @@ class Test():
           ax[1,0].axis('off')
           ax[1,0].title.set_text('Input Data')
           #res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,mode='symmetric',order=3)
-          psnr2 = psnr(self.recons_org[ra],self.recons_data[ra])
+          res = self.recons_data[ra]
+          psnr2 = psnr(self.recons_org[ra],res)
           ax[1,1].imshow(res[::,50,::],cmap='gray')
           ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
           ax[1,1].axis('off')

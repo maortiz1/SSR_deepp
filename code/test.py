@@ -174,9 +174,9 @@ class Test():
           ax[1,1].imshow(res[::,50,::],cmap='gray')
           ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
           ax[1,1].axis('off')
-          print(self.dataprep.gr_hr[ra].split('/'))
-          print(self.dataprep.gr_hr[ra].split('.'))
-          name = self.dataprep.gr_hr[ra]
+          print(self.dataprep.gt_hr[ra].split('/'))
+          print(self.dataprep.gt_hr[ra].split('.'))
+          name = self.dataprep.gt_hr[ra]
 
         
           plt.show()

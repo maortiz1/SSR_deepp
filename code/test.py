@@ -170,8 +170,8 @@ class Test():
           ax[1,0].imshow(self.recons_data[ra][::,50,::],cmap='gray')
           ax[1,0].axis('off')
           ax[1,0].title.set_text('Input Data')
-          res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,mode='symmetric',order=3)
-          psnr2 = psnr(self.recons_org[ra],res)
+          #res = resize(self.recons_data[ra],output_shape=self.recons_org[ra].shape,mode='symmetric',order=3)
+          psnr2 = psnr(self.recons_org[ra],self.recons_data[ra])
           ax[1,1].imshow(res[::,50,::],cmap='gray')
           ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
           ax[1,1].axis('off')
@@ -179,8 +179,14 @@ class Test():
           print(self.dataprep.gt_hr[ra].split('.'))
           name = self.dataprep.gt_hr[ra].split('/')[-1]
           name = name.split('.')[0]
-          name = "unet3d_out_"+name+'.nii'
+          name = "unet3d_out_recon"+name+'.nii'
           file = os.path.join(os.getcwd(),name)
+          print(file)
+          nib_file = nib.nifti1.Nifti1Image(self.recons_scores[ra] ,np.eye(4))
+          nib.save(nib_file,file)
+
+          name2 = "unet3d_out_downsampled"+name+'.nii'
+          file = os.path.join(os.getcwd(),name2)
           print(file)
           nib_file = nib.nifti1.Nifti1Image(self.recons_scores[ra] ,np.eye(4))
           nib.save(nib_file,file)

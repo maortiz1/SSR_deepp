@@ -185,11 +185,11 @@ class Test():
           print(file)
           nib_file = nib.nifti1.Nifti1Image(self.recons_scores[ra] ,np.eye(4))
           nib.save(nib_file,file)
-
+          name = name.split('.')[0]
           name2 = "unet3d_out_downsampled"+name+'.nii'
           file = os.path.join(os.getcwd(),name2)
           print(file)
-          nib_file = nib.nifti1.Nifti1Image(self.recons_scores[ra] ,np.eye(4))
+          nib_file = nib.nifti1.Nifti1Image(res,np.eye(4))
           nib.save(nib_file,file)
 
 

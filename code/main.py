@@ -71,7 +71,7 @@ if __name__=='__main__':
     parser.add_argument("-cu","--cuda",default="2",help="if cuda available number of cuda desire to be used")
     parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
     parser.add_argument("-bt","--batch_size",default=1,help="Batch size for -bt ")
-
+    parser.add_argument("-ft","--factor",default=3,help="Dowmsampling data for training")
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
 
@@ -141,12 +141,14 @@ if __name__=='__main__':
       down_f=[]
       crop = True
       vox_size=[]
+      factor = int(arguments.factor)
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
         down_f= image_utils.downsample
         vox_size = (32,32)
+        
       elif arguments.model == 'ResNetIso':
         n_resblock=arguments.n_resblock
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
@@ -165,7 +167,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=factor,downfunction=down_f,vox_size=vox_size)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr

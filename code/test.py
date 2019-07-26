@@ -178,7 +178,7 @@ class Test():
           print(self.dataprep.gt_hr[ra].split('/'))
           print(self.dataprep.gt_hr[ra].split('.'))
           name = self.dataprep.gt_hr[ra].split('/')[-1]
-          name = name.split('.')[-1]
+          name = name.split('.')[0]
           name = "unet3d_out_"+name+'.nii'
           file = os.path.join(os.getcwd(),name)
           print(file)

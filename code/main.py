@@ -72,6 +72,7 @@ if __name__=='__main__':
     parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
     parser.add_argument("-bt","--batch_size",default=1,help="Batch size for -bt ")
     parser.add_argument("-ft","--factor",default=3,help="Dowmsampling data for training")
+    parser.add_argument("-pw","--pretWeights",action='store_true')
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
 
@@ -160,6 +161,9 @@ if __name__=='__main__':
         down_f = image_utils.downsample_isotropic
         crop = True
         vox_size = (64,64)
+      if arguments.pretWeights:
+        file = arguments.file
+        mode_tr.load_state_dict(torch.load(file)['model_state_dict'])
 
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
@@ -197,6 +201,7 @@ if __name__=='__main__':
       file = []
       epoch_AC=[]
       optim_state_dic=[]
+      
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
@@ -222,7 +227,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,downfunction=donw_f)
+      dataprep = train.Data_Preparation(arguments.images,downfunction=down_f)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr

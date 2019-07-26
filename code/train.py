@@ -45,7 +45,7 @@ class Trainer:
         self.out_f = out #out folder for persistence values of training
         self.device = device # device for cuda if cuda available
         self.best_psnr = 0 # best psnr on validation set
-        self.beat_ssmi = 0 # best ssmi on validation set
+        self.best_ssmi = 0 # best ssmi on validation set
         self.best_model = [] # best model according to psnr validation results
         if not(os.path.isdir(self.out_f)):                  
            os.mkdir(self.out_f)
@@ -137,8 +137,10 @@ class Trainer:
             if self.sch:
                 self.lr_scheduler.step(mean_loss)  
                 print('sch')
-            if mean_psnr > self.best_psnr and mean_ssim > self.beat_ssmi:
+            if mean_psnr > self.best_psnr and mean_ssim > self.best_ssmi:
                 self.best_model = self.model
+                self.best_ssmi=mean_ssim
+                self.best_psnr=mean_psnr
                 torch.save({'epoch':self.ac_epoch,
                     'model_state_dict': self.best_model.state_dict(),
                     'optim_state_dict':self.optimizer.state_dict(),

@@ -145,7 +145,8 @@ class Test():
             ax.title.set_text(title)
         plt.show()
     def vis(self):
-        from skimage.transform import resize        
+        from skimage.transform import resize       
+        import nibabel as nib 
         import matplotlib.pyplot as plt
         fig,ax = plt.subplots(1,3)
         img_score = self.scores[65]
@@ -173,6 +174,9 @@ class Test():
           ax[1,1].imshow(res[::,50,::],cmap='gray')
           ax[1,1].title.set_text('Interpolation: PSNR %.2f'%(psnr2))
           ax[1,1].axis('off')
+          print(self.dataprep.gr_hr[ra].split('/'))
+          print(self.dataprep.gr_hr[ra].split('.'))
+          name = self.dataprep.gr_hr[ra]
 
         
           plt.show()

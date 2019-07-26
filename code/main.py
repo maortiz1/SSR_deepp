@@ -154,7 +154,7 @@ if __name__=='__main__':
         vox_size = (32,32)
       elif arguments.model == 'unet3D':
         mode_tr = unet.Unet3D()
-        print('in')
+
         down_f = image_utils.downsample_isotropic
         crop = True
         vox_size = (64,64)

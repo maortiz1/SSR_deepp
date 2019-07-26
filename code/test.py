@@ -148,6 +148,7 @@ class Test():
         from skimage.transform import resize       
         import nibabel as nib 
         import matplotlib.pyplot as plt
+        import os
         fig,ax = plt.subplots(1,3)
         img_score = self.scores[65]
         img_data = self.data[65]
@@ -176,7 +177,15 @@ class Test():
           ax[1,1].axis('off')
           print(self.dataprep.gt_hr[ra].split('/'))
           print(self.dataprep.gt_hr[ra].split('.'))
-          name = self.dataprep.gt_hr[ra]
+          name = self.dataprep.gt_hr[ra].split('/')[-1]
+          name = name.split('.')[-1]
+          name = "unet3d_out_"+name+'.nii'
+          file = os.path.join(os.getcwd(),name)
+          print(file)
+          nib_file = nib.nifti1.Nifti1Image(self.recons_scores[ra] ,np.eye(4))
+          nib.save(nib_file,file)
+
+
 
         
           plt.show()

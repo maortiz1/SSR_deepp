@@ -185,7 +185,7 @@ if __name__=='__main__':
       val_Dataset = train.Dataset(hr_test,lr_test)
       val_data_loader = data.DataLoader(val_Dataset,batch_size=bt_size,shuffle=False)
 
-      out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
+      out_f= 'all_%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
       if cuda:
         mode_tr.to(device)

@@ -295,7 +295,6 @@ if __name__=='__main__':
         pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in,vox_size=(64,64))
         scr=[]
         for img in pcs:
-
           data_in = np.expand_dims(img,axis=0)
           x = torch.from_numpy(np.expand_dims(data_in,axis=0).astype(np.float32)).permute(0,1,4,2,3)
           if cuda:
@@ -306,7 +305,7 @@ if __name__=='__main__':
           s_cpu = s.cpu().data.numpy()
           scr.append(s_cpu)
         img = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
-        fig, axes = subplot(1,2)
+        fig, axes = plt.subplots(1,2)
         axes[0].imshow(data_in[::,::,50],cmap='gray')
         axes[1].imshow(img[::,::,50],cmap='gray')
       

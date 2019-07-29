@@ -283,17 +283,26 @@ if __name__=='__main__':
       cuda = torch.cuda.is_available()
 
       mode_tr.load_state_dict(torch.load(file)['model_state_dict'])
+      if cuda:
+        mode_tr.to(device)
 
       fds = glob.glob(os.path.join(images,'*.nii.gz'))
-      import matplotlib as plt
+      import matplotlib.pyplot as plt
       for fa in fds:
         fa = nib.load(fa)
         data = fa.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
         print(data_in.shape)
         x = torch.from_numpy(np.expand_dims(data_in,axis=0).astype(np.float32)).permute(0,3,1,2)
+        if cuda:
+          x.to(device)
         score = mode_tr(x)
-        
+        s = score.squeeze().permute(1,2,0)
+        s_cpu = s.cpu().data.numpy()
+        fig, ax = plt.subplots(1,2)
+        ax[0].imshow(data_in[::,::,50])
+        ax[1].imshow(s_cpu[::,::,50])
+        plt.show()
 
 
 

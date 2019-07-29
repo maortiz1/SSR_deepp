@@ -289,7 +289,9 @@ if __name__=='__main__':
       fds = glob.glob(os.path.join(images,'*.nii.gz'))
       import matplotlib.pyplot as plt
       for fa in fds:
+        print(fa)
         fa = nib.load(fa)
+        
         data = fa.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
         pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in,vox_size=(64,64))

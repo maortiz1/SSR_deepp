@@ -310,6 +310,7 @@ if __name__=='__main__':
         fig, axes = plt.subplots(1,2)
         axes[0].imshow(data_in[::,::,50],cmap='gray')
         axes[1].imshow(img[::,::,50],cmap='gray')
+        plt.show()
       
 
 

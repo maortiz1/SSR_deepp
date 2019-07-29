@@ -115,7 +115,7 @@ if __name__=='__main__':
         print(device)
         cuda = torch.cuda.is_available()
 
-        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size,train=False)
+        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,factor=[5],vox_size=vox_size,train=False)
         #train dataset
         lr_train_vox = dataprep.lr_pcs_val
         hr_train_vox = dataprep.hr_pcs_val
@@ -171,7 +171,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size,test=False)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=[5],downfunction=down_f,vox_size=vox_size,test=False)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr

@@ -115,7 +115,7 @@ if __name__=='__main__':
         print(device)
         cuda = torch.cuda.is_available()
 
-        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size)
+        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size,train=False)
         #train dataset
         lr_train_vox = dataprep.lr_pcs_val
         hr_train_vox = dataprep.hr_pcs_val
@@ -171,7 +171,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size,test=False)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
@@ -237,8 +237,8 @@ if __name__=='__main__':
       shuffle = True
       train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
      
-      lr_test = dataprep.lr_pcs_ts
-      hr_test = dataprep.hr_pcs_ts
+      lr_test = dataprep.lr_pcs_val
+      hr_test = dataprep.hr_pcs_val
       testDataset = train.Dataset(hr_test,lr_test)
       test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
       out_f= 'Pretrained_%s_lr_%s_bt_%d_rb_sc%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)

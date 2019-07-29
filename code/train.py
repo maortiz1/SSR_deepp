@@ -171,10 +171,13 @@ class Trainer:
 
 
 class Data_Preparation():
-    def __init__(self,root_hr,crop=True,factor=[2,3,4,5],vox_size=(32,32),train_size=.6,n_samples=40,downfunction=utils.downsample):
+    def __init__(self,root_hr,crop=True,factor=[2,3,4,5],vox_size=(32,32),train_size=.6,n_samples=40,downfunction=utils.downsample,train=True,val=True,test=True):
         self.root_hr = root_hr
         self.vox_size = vox_size
         self.crop = crop
+        self.mk_train = train
+        self.mk_val = val
+        self.mk_test=test
         if os.path.isdir(root_hr):
             self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
         else:
@@ -228,107 +231,109 @@ class Data_Preparation():
         indx = 0
         num_im=[]
         print(downfunction)
-        for k in factor:
-            for i in  tr_samples:
-                img = nib.load(i)
-                data_img = img.get_fdata()
-                
-                lr_temp = downfunction(data_img,down_factor=k)
-                nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-                wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
-        
+        if self.mk_train:
+            for k in factor:
+                for i in  tr_samples:
+                    img = nib.load(i)
+                    data_img = img.get_fdata()
+                    
+                    lr_temp = downfunction(data_img,down_factor=k)
+                    nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                    wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+            
 
-                wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-                if self.crop:
-                    lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-                    hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-                    n_p_ls =[n_x_hr,n_y_hr]
-                    n_pc.append(n_p_ls)
-                    lr_pcs += lr_pc
-                    hr_pcs += hr_pc
-                else:
-                    lr_pcs.append(wh_norm_lr)
-                    hr_pcs.append(wh_norm_hr)
-                
-                indx +=1
-                num_im.append(indx)
-        self.lr_pcs_tr = lr_pcs
-        self.hr_pcs_tr = hr_pcs
-        self.tr_cr_pcs = n_pc
-        self.tr_num_img = num_im
-
-        lr_pcs = []
-        hr_pcs = []
-        n_pc = []
-        indx = 0
-        num_im=[]
-        for k in factor:
-            for i in  val_samples:
-                img = nib.load(i)
-                data_img = img.get_fdata()
-                
-                lr_temp = downfunction(data_img,down_factor=k)
-                nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-                wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
-
-
-
-                wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-                if self.crop:
-                    lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-                    hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-                    n_p_ls =[n_x_hr,n_y_hr]
-                    n_pc.append(n_p_ls)
-                    lr_pcs += lr_pc
-                    hr_pcs += hr_pc
-                else:
-                    lr_pcs.append(wh_norm_lr)
-                    hr_pcs.append(wh_norm_hr)
-
-                indx +=1
-                num_im.append(indx)
-
-        self.lr_pcs_val = lr_pcs
-        self.hr_pcs_val = hr_pcs
-        self.val_cr_pcs = n_pc
-        self.val_num_img = num_im    
-
+                    wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                    if self.crop:
+                        lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                        hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                        n_p_ls =[n_x_hr,n_y_hr]
+                        n_pc.append(n_p_ls)
+                        lr_pcs += lr_pc
+                        hr_pcs += hr_pc
+                    else:
+                        lr_pcs.append(wh_norm_lr)
+                        hr_pcs.append(wh_norm_hr)
+                    
+                    indx +=1
+                    num_im.append(indx)
+            self.lr_pcs_tr = lr_pcs
+            self.hr_pcs_tr = hr_pcs
+            self.tr_cr_pcs = n_pc
+            self.tr_num_img = num_im
 
         lr_pcs = []
         hr_pcs = []
         n_pc = []
         indx = 0
         num_im=[]
-        for k in factor:
-            for i in  ts_samples:
-                img = nib.load(i)
-                data_img = img.get_fdata()
-                
-                lr_temp = downfunction(data_img,down_factor=k)
-                nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-                wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+        if self.mk_val:
+            for k in factor:
+                for i in  val_samples:
+                    img = nib.load(i)
+                    data_img = img.get_fdata()
+                    
+                    lr_temp = downfunction(data_img,down_factor=k)
+                    nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                    wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
 
 
 
-                wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-                if self.crop:
-                    lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-                    hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-                    n_p_ls =[n_x_hr,n_y_hr]
-                    n_pc.append(n_p_ls)
-                    lr_pcs += lr_pc
-                    hr_pcs += hr_pc
-                else:
-                    lr_pcs.append(wh_norm_lr)
-                    hr_pcs.append(wh_norm_hr)
+                    wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                    if self.crop:
+                        lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                        hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                        n_p_ls =[n_x_hr,n_y_hr]
+                        n_pc.append(n_p_ls)
+                        lr_pcs += lr_pc
+                        hr_pcs += hr_pc
+                    else:
+                        lr_pcs.append(wh_norm_lr)
+                        hr_pcs.append(wh_norm_hr)
 
-                indx +=1
-                num_im.append(indx)
+                    indx +=1
+                    num_im.append(indx)
 
-        self.lr_pcs_ts = lr_pcs
-        self.hr_pcs_ts = hr_pcs
-        self.ts_cr_pcs = n_pc
-        self.ts_num_img = num_im
+            self.lr_pcs_val = lr_pcs
+            self.hr_pcs_val = hr_pcs
+            self.val_cr_pcs = n_pc
+            self.val_num_img = num_im    
+
+        lr_pcs = []
+        hr_pcs = []
+        n_pc = []
+        indx = 0
+        num_im=[]
+        if self.mk_test:
+            for k in factor:
+                for i in  ts_samples:
+                    img = nib.load(i)
+                    data_img = img.get_fdata()
+                    
+                    lr_temp = downfunction(data_img,down_factor=k)
+                    nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                    wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+
+
+
+                    wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                    if self.crop:
+                        lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                        hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                        n_p_ls =[n_x_hr,n_y_hr]
+                        n_pc.append(n_p_ls)
+                        lr_pcs += lr_pc
+                        hr_pcs += hr_pc
+                    else:
+                        lr_pcs.append(wh_norm_lr)
+                        hr_pcs.append(wh_norm_hr)
+
+                    indx +=1
+                    num_im.append(indx)
+
+            self.lr_pcs_ts = lr_pcs
+            self.hr_pcs_ts = hr_pcs
+            self.ts_cr_pcs = n_pc
+            self.ts_num_img = num_im
     def reconstruct(self,scores,type='test'):
         all_join = []
         np_ts = self.ts_cr_pcs

@@ -117,12 +117,12 @@ if __name__=='__main__':
 
         dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size)
         #train dataset
-        lr_train_vox = dataprep.lr_pcs_tr
-        hr_train_vox = dataprep.hr_pcs_tr
+        lr_train_vox = dataprep.lr_pcs_val
+        hr_train_vox = dataprep.hr_pcs_val
         trainDataset = train.Dataset(hr_train_vox,lr_train_vox )       
         bt_size = int(arguments.batch_size)
         shuffle = True
-        train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
+        train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=False)
         #tEST
         lr_test = dataprep.lr_pcs_ts
         hr_test = dataprep.hr_pcs_ts

@@ -66,6 +66,8 @@ class Unet3D(nn.Module):
         cb5 = self.cb5(pooling4)    
 
         eb1 = self.eb1(cb5)
+        print(eb1.shape)
+         print(cb4.shape)
         eb1 = torch.cat((eb1,cb4),1)        
         cb6 = self.cb6(eb1)
       

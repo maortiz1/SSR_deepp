@@ -286,7 +286,7 @@ if __name__=='__main__':
       if cuda:
         mode_tr.to(device)
 
-      fds = glob.glob(os.path.join(images,'*.nii.gz'))
+      fds = glob.glob(os.path.join(images,'*.nii'))
       import matplotlib.pyplot as plt
       for fa in fds:
         print(fa)
@@ -306,7 +306,7 @@ if __name__=='__main__':
           s = score.squeeze().permute(1,2,0)
           s_cpu = s.cpu().data.numpy()
           scr.append(s_cpu)
-        img = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
+        recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
         fig, axes = plt.subplots(1,2)
         axes[0].imshow(data_in[::,::,50],cmap='gray')
         axes[1].imshow(img[::,::,50],cmap='gray')

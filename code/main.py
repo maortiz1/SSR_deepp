@@ -9,7 +9,7 @@ from torch.utils import data
 import os
 import test
 import numpy as np
-
+import glob
 
 def main():
  
@@ -74,6 +74,7 @@ if __name__=='__main__':
     parser.add_argument("-ft","--factor",default=3,help="Dowmsampling data for training")
     parser.add_argument("-pw","--pretWeights",action='store_true')
     parser.add_argument("-de","--demo",action='store_true')
+
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
 
@@ -92,6 +93,7 @@ if __name__=='__main__':
         down_f=[]
         crop = True
         vox_size=[]
+        factor=arguments.factor
         if arguments.model == 'ResNET':
           n_resblock = arguments.n_resblock
           out_size = arguments.output_sz
@@ -116,7 +118,7 @@ if __name__=='__main__':
         print(device)
         cuda = torch.cuda.is_available()
 
-        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,factor=[5],vox_size=vox_size,train=False)
+        dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,factor=[int(factor)],vox_size=vox_size,train=False)
         #train dataset
         lr_train_vox = dataprep.lr_pcs_val
         hr_train_vox = dataprep.hr_pcs_val
@@ -172,7 +174,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=[5],downfunction=down_f,vox_size=vox_size,test=False)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=[factor],downfunction=down_f,vox_size=vox_size,test=False)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
@@ -186,7 +188,7 @@ if __name__=='__main__':
       val_Dataset = train.Dataset(hr_test,lr_test)
       val_data_loader = data.DataLoader(val_Dataset,batch_size=bt_size,shuffle=False)
 
-      out_f= 'all_%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
+      out_f= 'all_%s_lr_%s_bt_%d_rb_%d_ft_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock,factor)
 
       if cuda:
         mode_tr.to(device)
@@ -203,7 +205,7 @@ if __name__=='__main__':
       file = []
       epoch_AC=[]
       optim_state_dic=[]
-      
+      factor = int(arguments.factor)
       if arguments.model == 'ResNET':
         n_resblock = arguments.n_resblock
         out_size = arguments.output_sz
@@ -229,7 +231,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,downfunction=down_f)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=[factor],downfunction=down_f,vox_size=vox_size,test=False)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
@@ -253,4 +255,51 @@ if __name__=='__main__':
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,epoch=epoch_AC,pretrained=True,file=file)
       max_epoch = 1000
       trainer.train(max_epoch)
+    elif arguments.demo:
+      import nibabel as nib
+      images = arguments.images
+      file =arguments.file
+      if arguments.model == 'ResNET':
+        n_resblock = arguments.n_resblock
+        out_size = arguments.output_sz
+        mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+        down_f= image_utils.downsample
+        vox_size = (32,32)
+      elif arguments.model == 'ResNetIso':
+        n_resblock=arguments.n_resblock
+        mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
+        down_f = image_utils.downsample_isotropic
+        vox_size = (32,32)
+      elif arguments.model == 'unet3D':
+        mode_tr = unet.Unet3D()
+
+        down_f = image_utils.downsample_isotropic
+        crop = True
+        vox_size = (64,64)
+      gpu = int(arguments.cuda)
+      torch.cuda.set_device(gpu)
+      device = 'cuda:%s'%(arguments.cuda)
+      print(device)
+      cuda = torch.cuda.is_available()
+
+      mode_tr.load_state_dict(torch.load(file)['model_state_dict'])
+
+      fds = glob.glob(os.path.join(images,'*.nii.gz'))
+      import matplotlib as plt
+      for fa in fds:
+        fa = nib.load(fa)
+        data = fa.get_fdata()
+        print(data.shape)
+        score = mode_tr(data)
+        
+
+
+
+
+
+
+
+
+
+
       

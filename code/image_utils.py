@@ -175,6 +175,11 @@ def cropall(img,vox_size=(32,32)):
     # print(len(pcs))
     return pcs,n_pz_x,n_pz_y
 
+def upsample_factor(img,factor):
+    from skimage.transform import resize
+    sz= img.shape
+    sz_out = (sz[0],sz[1],sz[2]*factor)
+    return resize(img,sz_out,mode='symmetric',order=3)
 
 
 

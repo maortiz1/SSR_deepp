@@ -289,8 +289,10 @@ if __name__=='__main__':
       for fa in fds:
         fa = nib.load(fa)
         data = fa.get_fdata()
-        print(data.shape)
-        score = mode_tr(data)
+        data_in = image_utils.upsample_factor(data,factor=3)
+        print(data_in.shape)
+        x = torch.from_numpy(np.expand_dims(data_in,axis=0).astype(np.float32)).permute(0,3,1,2)
+        score = mode_tr(x)
         
 
 

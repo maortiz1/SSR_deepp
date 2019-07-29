@@ -50,24 +50,31 @@ class Unet3D(nn.Module):
 
     def forward(self,x):
         cb0 = self.cb0(x)
-
+        print('Cb0: ',cb0.shape)
         cb1 = self.cb1(cb0)
+        print('Cb1: ',cb1.shape)
         pooling1 = self.pooling1(cb1)
-
+        print(' pool1: ',pooling1.shape)
         cb2 = self.cb2(pooling1)
+        print(' cb2: ',cb2.shape)
         pooling2 = self.pooling2(cb2)
+        print(' pool2: ',pooling2.shape)
      
         cb3 = self.cb3(pooling2)
+        print(' cb3: ',cb3.shape)
         pooling3 = self.pooling3(cb3)
+        print(' pool3: ',pooling3.shape)
         
         cb4 = self.cb4(pooling3)
+        print(' cb4: ',cb4.shape)
         pooling4 = self.pooling4(cb4)
+        print(' pool4: ',pooling4.shape)
         
         cb5 = self.cb5(pooling4)    
+        print(' cb5: ',cb5.shape)
 
         eb1 = self.eb1(cb5)
-        print(eb1.shape)
-        print(cb4.shape)
+        print(' eb1: ',eb1.shape)
         eb1 = torch.cat((eb1,cb4),1)        
         cb6 = self.cb6(eb1)
       

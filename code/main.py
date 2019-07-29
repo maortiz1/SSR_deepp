@@ -293,6 +293,7 @@ if __name__=='__main__':
         data = fa.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
         print(data_in.shape)
+        data_in = np.expand_dims(data_in,axis=0)
         x = torch.from_numpy(np.expand_dims(data_in,axis=0).astype(np.float32)).permute(0,3,1,2)
         if cuda:
           x.to(device)

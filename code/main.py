@@ -105,7 +105,7 @@ if __name__=='__main__':
           mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
           down_f = image_utils.downsample_isotropic
           vox_size = (32,32)
-        elif arguments.model == 'unet3D':
+        elif arguments.model == 'unet3d':
           mode_tr = unet.Unet3D()
           print('in')
           down_f = image_utils.downsample_isotropic
@@ -158,7 +158,7 @@ if __name__=='__main__':
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
         down_f = image_utils.downsample_isotropic
         vox_size = (32,32)
-      elif arguments.model == 'unet3D':
+      elif arguments.model == 'unet3d':
         mode_tr = unet.Unet3D()
 
         down_f = image_utils.downsample_isotropic
@@ -270,7 +270,7 @@ if __name__=='__main__':
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
         down_f = image_utils.downsample_isotropic
         vox_size = (32,32)
-      elif arguments.model == 'unet3D':
+      elif arguments.model == 'unet3d':
         mode_tr = unet.Unet3D()
 
         down_f = image_utils.downsample_isotropic

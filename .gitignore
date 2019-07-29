@@ -7,4 +7,5 @@ images/
 *.pyc
 *.pth.tar
 .vscode/
-
+*.nii.gz
+test_images/

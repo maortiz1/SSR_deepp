@@ -73,6 +73,7 @@ if __name__=='__main__':
     parser.add_argument("-bt","--batch_size",default=1,help="Batch size for -bt ")
     parser.add_argument("-ft","--factor",default=3,help="Dowmsampling data for training")
     parser.add_argument("-pw","--pretWeights",action='store_true')
+    parser.add_argument("-de","--demo",action='store_true')
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
 

@@ -294,7 +294,9 @@ if __name__=='__main__':
         
         data = fa.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
-        pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in,vox_size=(64,64))
+        data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
+        data_in_wh = image_utils.normalize_image_whitestripe(data_in_wh,contrast='T2')
+        pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))
         scr=[]
         for img in pcs:
           data_crop = np.expand_dims(img,axis=0)
@@ -309,7 +311,7 @@ if __name__=='__main__':
         recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
        
         fig, axes = plt.subplots(1,2)
-        axes[0].imshow(data_in[::,50,::],cmap='gray')
+        axes[0].imshow(data_in_wh[::,50,::],cmap='gray')
         axes[1].imshow(recons[0][::,50,::],cmap='gray')
         plt.show()
       

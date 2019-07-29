@@ -178,7 +178,7 @@ def cropall(img,vox_size=(32,32)):
 def upsample_factor(img,factor):
     from skimage.transform import resize
     sz= img.shape
-    sz_out = (sz[0],sz[1],sz[2]*factor)
+    sz_out = (sz[0],sz[1],sz[2]*factor+2)
     return resize(img,sz_out,mode='symmetric',order=3)
 
 def reconstruct_npz(scores,npzs):

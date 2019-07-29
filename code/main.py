@@ -307,9 +307,10 @@ if __name__=='__main__':
           s_cpu = s.cpu().data.numpy()
           scr.append(s_cpu)
         recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
+       
         fig, axes = plt.subplots(1,2)
         axes[0].imshow(data_in[::,50,::],cmap='gray')
-        axes[1].imshow(recons[::,50,::],cmap='gray')
+        axes[1].imshow(recons[0][::,50,::],cmap='gray')
         plt.show()
       
 

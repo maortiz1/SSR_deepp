@@ -292,19 +292,25 @@ if __name__=='__main__':
         fa = nib.load(fa)
         data = fa.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
-        print(data_in.shape)
-        data_in = np.expand_dims(data_in,axis=0)
-        x = torch.from_numpy(np.expand_dims(data_in,axis=0).astype(np.float32)).permute(0,1,4,2,3)
-        if cuda:
-          print(cuda)
-          x= x.to(device)
-        score = mode_tr(x)
-        s = score.squeeze().permute(1,2,0)
-        s_cpu = s.cpu().data.numpy()
-        fig, ax = plt.subplots(1,2)
-        ax[0].imshow(data_in[::,::,50])
-        ax[1].imshow(s_cpu[::,::,50])
-        plt.show()
+        pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in,vox_size=(64,64))
+        scr=[]
+        for img in pcs:
+
+          data_in = np.expand_dims(img,axis=0)
+          x = torch.from_numpy(np.expand_dims(data_in,axis=0).astype(np.float32)).permute(0,1,4,2,3)
+          if cuda:
+            print(cuda)
+            x= x.to(device)
+          score = mode_tr(x)
+          s = score.squeeze().permute(1,2,0)
+          s_cpu = s.cpu().data.numpy()
+          scr.append(s_cpu)
+        img = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
+        fig, axes = subplot(1,2)
+        axes[0].imshow(data_in[::,::,50],cmap='gray')
+        axes[1].imshow(img[::,::,50],cmap='gray')
+      
+
 
 
 

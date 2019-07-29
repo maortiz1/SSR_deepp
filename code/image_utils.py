@@ -181,6 +181,43 @@ def upsample_factor(img,factor):
     sz_out = (sz[0],sz[1],sz[2]*factor)
     return resize(img,sz_out,mode='symmetric',order=3)
 
+def reconstruct_npz(scores,npzs):
+    import numpy as np
+    all_join = []
+    np_ts = npzs
+    i=0
+    for indx, f in enumerate(np_ts):
+        x_px = f[0]
+        y_px = f[1]
+        n_pz = y_px*x_px
+        # print(f)
+        # print('[%d,%d] length: %d'%(i,i+n_pz,len(scores)))
+        a=[]
+        l_pz = scores[i:i+n_pz]
+        for j in range(0,x_px):
+            y_pz = l_pz[j*y_px:j*y_px+y_px]
+
+            cot = []
+            for k in range(0,y_px):
+                ac = y_pz[k]
+                # plt.imshow(ac[::,::,100])
+                # plt.show()
+                # print(ac.shape)
+                if k == 0:
+                    cot = ac
+                else:
+                    cot=np.concatenate((cot,ac),axis=1)
+
+                # plt.imshow(cot[::,::,100])
+                # plt.show()
+            if j == 0:
+                a = cot
+            else:
+                a = np.concatenate((a,cot),axis=0)
+        i=n_pz+i
+
+        all_join.append(a)
+    return all_join    
 
 
 

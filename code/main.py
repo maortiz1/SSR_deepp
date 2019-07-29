@@ -286,7 +286,7 @@ if __name__=='__main__':
       if cuda:
         mode_tr.to(device)
 
-      fds = glob.glob(os.path.join(images,'*.nii'))
+      fds = glob.glob(os.path.join(images,'*.nii.gz'))
       import matplotlib.pyplot as plt
       for fa in fds:
         print(fa)

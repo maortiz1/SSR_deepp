@@ -14,10 +14,10 @@ import os
 import math
 import nibabel as nib 
 class Trainer:
-    def __init__(self, loader_train,loader_test,cuda,scale,model,lr,out,device,sch=True,st=50,epoch=0,pretrained = False,file=''):
+    def __init__(self, loader_train,loader_val,cuda,scale,model,lr,out,device,sch=True,st=50,epoch=0,pretrained = False,file=''):
         self.scale = scale #scale_factor
         self.data_loader_train = loader_train #data loader for training dataset
-        self.data_loader_test = loader_test #data loader for validation dataset
+        self.data_loader_val = loader_val #data loader for validation dataset
         self.model = model #model to be trained
         self.loss = nn.MSELoss() # loss for training 
         self.cuda = cuda #if cuda available is true for gpu usage
@@ -115,7 +115,7 @@ class Trainer:
             psnr_ts=[]
             ssim_ts=[]
             
-            for  batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_test),total=len(self.data_loader_test),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
+            for  batch_idx,(data,target) in tqdm.tqdm(enumerate(self.data_loader_val),total=len(self.data_loader_val),desc='Test epoch %d'%self.ac_epoch,ncols=80,leave=False):
 
                 if self.cuda:
                     data,target = data.to(self.device),target.to(self.device)
@@ -171,7 +171,7 @@ class Trainer:
 
 
 class Data_Preparation():
-    def __init__(self,root_hr,crop=True,factor=3,vox_size=(32,32),train_size=.7,n_samples=40,downfunction=utils.downsample):
+    def __init__(self,root_hr,crop=True,factor=[2,3,4,5],vox_size=(32,32),train_size=.6,n_samples=40,downfunction=utils.downsample):
         self.root_hr = root_hr
         self.vox_size = vox_size
         self.crop = crop
@@ -210,49 +210,88 @@ class Data_Preparation():
             plt.waitforbuttonpress(0)
             
 
-    def generate_voxels(self,factor=3,vox_size=(32,32),train_size=0.7,downfunction=utils.downsample):
+    def generate_voxels(self,factor,vox_size=(32,32),train_size=0.7,downfunction=utils.downsample):
         import nibabel as nib
         import image_utils as utils
         import matplotlib.pyplot as plt
         tr_size = round(len(self.gt_hr)*train_size)-1
         ts_size = len(self.gt_hr)-tr_size
-
+        val_size = (ts_size)//2
+        test_size=1-(ts_size)//2
+        
         tr_samples = self.gt_hr[0:tr_size]
-        ts_samples = self.gt_hr[tr_size:-1]
+        val_samples = self.gt_hr[tr_size:tr_size+val_size]
+        ts_samples = self.gt_hr[tr_size+val_size:-1]
         lr_pcs = []
         hr_pcs = []
         n_pc = []
         indx = 0
         num_im=[]
         print(downfunction)
-        for i in  tr_samples:
-            img = nib.load(i)
-            data_img = img.get_fdata()
-            
-            lr_temp = downfunction(data_img,down_factor=factor)
-            nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-            wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
-      
+        for k in factor:
+            for i in  tr_samples:
+                img = nib.load(i)
+                data_img = img.get_fdata()
+                
+                lr_temp = downfunction(data_img,down_factor=k)
+                nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+        
 
-            wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-            if self.crop:
-                lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-                hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-                n_p_ls =[n_x_hr,n_y_hr]
-                n_pc.append(n_p_ls)
-                lr_pcs += lr_pc
-                hr_pcs += hr_pc
-            else:
-                lr_pcs.append(wh_norm_lr)
-                hr_pcs.append(wh_norm_hr)
-            
-            indx +=1
-            num_im.append(indx)
+                wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                if self.crop:
+                    lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                    hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                    n_p_ls =[n_x_hr,n_y_hr]
+                    n_pc.append(n_p_ls)
+                    lr_pcs += lr_pc
+                    hr_pcs += hr_pc
+                else:
+                    lr_pcs.append(wh_norm_lr)
+                    hr_pcs.append(wh_norm_hr)
+                
+                indx +=1
+                num_im.append(indx)
         self.lr_pcs_tr = lr_pcs
         self.hr_pcs_tr = hr_pcs
         self.tr_cr_pcs = n_pc
         self.tr_num_img = num_im
-    
+
+        lr_pcs = []
+        hr_pcs = []
+        n_pc = []
+        indx = 0
+        num_im=[]
+        for k in factor:
+            for i in  val_samples:
+                img = nib.load(i)
+                data_img = img.get_fdata()
+                
+                lr_temp = downfunction(data_img,down_factor=k)
+                nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+
+
+
+                wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                if self.crop:
+                    lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                    hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                    n_p_ls =[n_x_hr,n_y_hr]
+                    n_pc.append(n_p_ls)
+                    lr_pcs += lr_pc
+                    hr_pcs += hr_pc
+                else:
+                    lr_pcs.append(wh_norm_lr)
+                    hr_pcs.append(wh_norm_hr)
+
+                indx +=1
+                num_im.append(indx)
+
+        self.lr_pcs_val = lr_pcs
+        self.hr_pcs_val = hr_pcs
+        self.val_cr_pcs = n_pc
+        self.val_num_img = num_im    
 
 
         lr_pcs = []
@@ -260,30 +299,31 @@ class Data_Preparation():
         n_pc = []
         indx = 0
         num_im=[]
-        for i in  ts_samples:
-            img = nib.load(i)
-            data_img = img.get_fdata()
-            
-            lr_temp = downfunction(data_img,down_factor=factor)
-            nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-            wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+        for k in factor:
+            for i in  ts_samples:
+                img = nib.load(i)
+                data_img = img.get_fdata()
+                
+                lr_temp = downfunction(data_img,down_factor=k)
+                nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
 
 
 
-            wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-            if self.crop:
-                lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-                hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-                n_p_ls =[n_x_hr,n_y_hr]
-                n_pc.append(n_p_ls)
-                lr_pcs += lr_pc
-                hr_pcs += hr_pc
-            else:
-                lr_pcs.append(wh_norm_lr)
-                hr_pcs.append(wh_norm_hr)
+                wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                if self.crop:
+                    lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                    hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                    n_p_ls =[n_x_hr,n_y_hr]
+                    n_pc.append(n_p_ls)
+                    lr_pcs += lr_pc
+                    hr_pcs += hr_pc
+                else:
+                    lr_pcs.append(wh_norm_lr)
+                    hr_pcs.append(wh_norm_hr)
 
-            indx +=1
-            num_im.append(indx)
+                indx +=1
+                num_im.append(indx)
 
         self.lr_pcs_ts = lr_pcs
         self.hr_pcs_ts = hr_pcs
@@ -294,6 +334,8 @@ class Data_Preparation():
         np_ts = self.ts_cr_pcs
         if type =='train':
             np_ts=self.tr_cr_pcs
+        elif type== 'val':
+            np_ts=self.val_cr_pcs
         i=0
         for indx, f in enumerate(np_ts):
             x_px = f[0]

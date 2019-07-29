@@ -126,12 +126,12 @@ if __name__=='__main__':
         #tEST
         lr_test = dataprep.lr_pcs_ts
         hr_test = dataprep.hr_pcs_ts
-        testDataset = train.Dataset(hr_test,lr_test)
-        test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
+        val_Dataset = train.Dataset(hr_test,lr_test)
+        val_data_loader = data.DataLoader(val_Dataset,batch_size=bt_size,shuffle=False)
         file = arguments.file
         
         
-        test = test.Test(test_data_loader,train_data_loader,dataprep,file,cuda,device,mode_tr)
+        test = test.Test(val_data_loader,train_data_loader,dataprep,file,cuda,device,mode_tr)
         
         test.vis_3()
         test.plot_history_loss()
@@ -171,7 +171,7 @@ if __name__=='__main__':
       print(device)
       cuda = torch.cuda.is_available()
 
-      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=factor,downfunction=down_f,vox_size=vox_size)
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,downfunction=down_f,vox_size=vox_size)
       #train dataset
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
@@ -180,10 +180,11 @@ if __name__=='__main__':
       shuffle = True
       train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
       #tEST
-      lr_test = dataprep.lr_pcs_ts
-      hr_test = dataprep.hr_pcs_ts
-      testDataset = train.Dataset(hr_test,lr_test)
-      test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
+      lr_test = dataprep.lr_pcs_val
+      hr_test = dataprep.hr_pcs_val
+      val_Dataset = train.Dataset(hr_test,lr_test)
+      val_data_loader = data.DataLoader(val_Dataset,batch_size=bt_size,shuffle=False)
+
       out_f= '%s_lr_%s_bt_%d_rb_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
       if cuda:
@@ -191,7 +192,7 @@ if __name__=='__main__':
    
 
 
-      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
+      trainer = train.Trainer(train_data_loader,val_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
       max_epoch = 1000
       trainer.train(max_epoch)
 

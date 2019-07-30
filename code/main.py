@@ -325,7 +325,7 @@ if __name__=='__main__':
         nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
         nib.save(nib_file,file)
         # plt.show()
-        data_in_wh = image_utils.normalize_image_whitestripe(data,contrast='T2')
+        data_in_wh = image_utils.normalize_image_whitestripe(fi,contrast='T2')
         pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))
         recons = image_utils.reconstruct_npz(pcs,[[n_pz_x,n_pz_y]])
         nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))

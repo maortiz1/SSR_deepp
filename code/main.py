@@ -311,8 +311,8 @@ if __name__=='__main__':
         recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
        
         fig, axes = plt.subplots(1,2)
-        axes[0].imshow(data_in_wh[::,50,::],cmap='gray')
-        axes[1].imshow(recons[0][::,50,::],cmap='gray')
+        axes[0].imshow(data_in_wh[::,200,::],cmap='gray')
+        axes[1].imshow(recons[0][::,200,::],cmap='gray')
         name = fa.split('/')[-1]
         name = name.split('.')[0]
         name = "test_"+name+'.nii.gz'

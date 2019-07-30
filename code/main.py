@@ -282,8 +282,8 @@ if __name__=='__main__':
       device = 'cuda:%s'%(arguments.cuda)
       print(device)
       cuda = torch.cuda.is_available()
-
-      mode_tr.load_state_dict(torch.load(file)['model_state_dict'])
+      file_m = torch.load(file)
+      mode_tr.load_state_dict(file_m['model_state_dict'])
       if cuda:
         mode_tr.to(device)
 

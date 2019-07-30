@@ -290,9 +290,9 @@ if __name__=='__main__':
       import matplotlib.pyplot as plt
       for fa in fds:
         print(fa)
-        fa = nib.load(fa)
+        fi= nib.load(fa)
         
-        data = fa.get_fdata()
+        data = fi.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
         data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
         data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T2')
@@ -313,6 +313,12 @@ if __name__=='__main__':
         fig, axes = plt.subplots(1,2)
         axes[0].imshow(data_in_wh[::,50,::],cmap='gray')
         axes[1].imshow(recons[0][::,50,::],cmap='gray')
+        name = fa.split('/')[-1]
+        name = name.split('.')[0]
+        name = "test_"+name+'.nii.gz'
+        file = os.path.join(os.getcwd(),name)
+        nib_file = nib.nifti1.Nifti1Image(recons,np.eye(4))
+        nib.save(nib_file,file)
         plt.show()
       
 

@@ -74,6 +74,7 @@ if __name__=='__main__':
     parser.add_argument("-ft","--factor",default=3,help="Dowmsampling data for training")
     parser.add_argument("-pw","--pretWeights",action='store_true')
     parser.add_argument("-de","--demo",action='store_true')
+    parser.add_argument("-con","--contt",action='store_true')
 
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
@@ -199,7 +200,7 @@ if __name__=='__main__':
       max_epoch = 1000
       trainer.train(max_epoch)
 
-    elif arguments.pretrained:
+    elif arguments.contt:
       mode_tr=[]
       down_f=[]
       file = []
@@ -244,7 +245,7 @@ if __name__=='__main__':
       hr_test = dataprep.hr_pcs_val
       testDataset = train.Dataset(hr_test,lr_test)
       test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=False)
-      out_f= 'Pretrained_%s_lr_%s_bt_%d_rb_sc%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
+      out_f= 'Continue_%s_lr_%s_bt_%d_rb_sc%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock)
 
 
 
@@ -321,7 +322,71 @@ if __name__=='__main__':
         nib_file = nib.nifti1.Nifti1Image(recons[0],fi.affine)
         nib.save(nib_file,file)
         plt.show()
+    elif arguments.pretrained:
+      mode_tr=[]
+      down_f=[]
+      file = []
+      epoch_AC=[]
+      optim_state_dic=[]
+      factor = int(arguments.factor)
+      if arguments.model == 'ResNET':
+        n_resblock = arguments.n_resblock
+        out_size = arguments.output_sz
+        mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+        down_f= image_utils.downsample
+        file = torch.load(arguments.file)
+        mode_tr.load_state_dict(file['model_state_dict'])
+        
+        epoch_AC = file['epoch']
+
+      elif arguments.model == 'ResNetIso':
+        n_resblock=arguments.n_resblock
+        mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
+        down_f = image_utils.downsample_isotropic
+        file =  torch.load(arguments.file)
+        mode_tr.load_state_dict(file['model_state_dict'])
+        
+        epoch_AC = file['epoch']
+      elif arguments.model == 'unet3d':
+        mode_tr = unet.Unet3D()
+        file =  torch.load(arguments.file)
+        mode_tr.load_state_dict(file['model_state_dict'])
+        down_f = image_utils.downsample_isotropic
+        crop = True
+        vox_size = (64,64)
+
+      gpu = int(arguments.cuda)
+      torch.cuda.set_device(gpu)
+      device = 'cuda:%s'%(arguments.cuda)
+      print(device)
+      cuda = torch.cuda.is_available()
+
+      dataprep = train.Data_Preparation(arguments.images,crop=crop,factor=[factor],downfunction=down_f,vox_size=vox_size,test=False)
+      #train dataset
+      lr_train_vox = dataprep.lr_pcs_tr
+      hr_train_vox = dataprep.hr_pcs_tr
+      trainDataset = train.Dataset(hr_train_vox,lr_train_vox )       
+      bt_size = 5
+      shuffle = True
+      train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
+     
+      lr_test = dataprep.lr_pcs_val
+      hr_test = dataprep.hr_pcs_val
+      testDataset = train.Dataset(hr_test,lr_test)
+      test_data_loader = data.DataLoader(testDataset,batch_size=bt_size,shuffle=shuffle)
+      out_f= 'PretrainedW_%s_lr_%s_bt_%d_rb_fa%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,factor)
       
+      
+
+
+
+
+      if cuda:
+        mode_tr.to(device)
+
+      trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
+      max_epoch = 1000
+      trainer.train(max_epoch)        
 
 
 

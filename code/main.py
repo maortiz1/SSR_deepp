@@ -280,7 +280,7 @@ if __name__=='__main__':
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
       device = 'cuda:%s'%(arguments.cuda)
-      print(device)
+      
       cuda = torch.cuda.is_available()
       file_m = torch.load(file,map_location='cpu')
       mode_tr.load_state_dict(file_m['model_state_dict'])

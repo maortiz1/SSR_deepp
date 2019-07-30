@@ -74,7 +74,7 @@ class Test():
                 p,s = self.metrics(t.squeeze(),s.squeeze())
                 psnr_ts.append(p)
                 ssim_ts.append(s)
-                
+            
             d = data.squeeze().permute(1,2,0)
             d_cpu = d.cpu().data.numpy()
             t = target.squeeze().permute(1,2,0)
@@ -185,12 +185,22 @@ class Test():
           print(file)
           nib_file = nib.nifti1.Nifti1Image(self.recons_scores[ra] ,np.eye(4))
           nib.save(nib_file,file)
+          name = self.dataprep.gt_hr[ra].split('/')[-1]
           name = name.split('.')[0]
-          name2 = "unet3d_out_downsampled"+name+'.nii'
+          name2 = "unet3d_out_downsampled_"+name+'.nii'
           file = os.path.join(os.getcwd(),name2)
           print(file)
           nib_file = nib.nifti1.Nifti1Image(res,np.eye(4))
           nib.save(nib_file,file)
+
+          name = self.dataprep.gt_hr[ra].split('/')[-1]
+          name = name.split('.')[0]
+          name2 = "recon_ori_"+name+'.nii'
+          file = os.path.join(os.getcwd(),name2)
+          print(file)
+          nib_file = nib.nifti1.Nifti1Image(self.recons_org[ra],np.eye(4))
+          nib.save(nib_file,file)
+
 
 
 

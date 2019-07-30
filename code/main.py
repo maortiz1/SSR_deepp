@@ -295,14 +295,14 @@ if __name__=='__main__':
         data = fi.get_fdata()
         data_in = image_utils.upsample_factor(data,factor=3)
         data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
-        data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T1')
+        data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T2')
         pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))
         scr=[]
         for img in pcs:
           data_crop = np.expand_dims(img,axis=0)
           x = torch.from_numpy(np.expand_dims(data_crop,axis=0).astype(np.float32)).permute(0,1,4,2,3)
           if cuda:
-            print(cuda)
+            
             x= x.to(device)
           score = mode_tr(x)
           s = score.squeeze().permute(1,2,0)

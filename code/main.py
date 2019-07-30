@@ -324,7 +324,13 @@ if __name__=='__main__':
         nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
         nib.save(nib_file,file)
         plt.show()
-        
+        recons = image_utils.reconstruct_npz(pcs,[[n_pz_x,n_pz_y]])
+        nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
+        name = fa.split('/')[-1]
+        name = name.split('.')[0]
+        name = "test_ori"+name+'.nii.gz'
+        file = os.path.join(os.getcwd(),name)
+        nib.save(nib_file,file)
     elif arguments.pretrained:
       mode_tr=[]
       down_f=[]

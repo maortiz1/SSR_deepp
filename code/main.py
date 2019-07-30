@@ -294,7 +294,7 @@ if __name__=='__main__':
         fi= nib.load(fa)
         
         data = fi.get_fdata()
-        data_in = image_utils.upsample_factor(data,factor=3)
+        data_in = image_utils.upsample_factor(data)
         data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
         data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T2')
         pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))

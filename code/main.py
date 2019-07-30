@@ -335,7 +335,7 @@ if __name__=='__main__':
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
         down_f= image_utils.downsample
-        file = torch.load(arguments.file)
+        file = torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
         
         epoch_AC = file['epoch']

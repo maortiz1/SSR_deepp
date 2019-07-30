@@ -282,7 +282,7 @@ if __name__=='__main__':
       device = 'cuda:%s'%(arguments.cuda)
       print(device)
       cuda = torch.cuda.is_available()
-      file_m = torch.load(file)
+      file_m = torch.load(file,map_location='cpu')
       mode_tr.load_state_dict(file_m['model_state_dict'])
       if cuda:
         mode_tr.to(device)
@@ -335,7 +335,7 @@ if __name__=='__main__':
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
         down_f= image_utils.downsample
-        file = torch.load(arguments.file,map_location='cpu')
+        file = torch.load(arguments.file)
         mode_tr.load_state_dict(file['model_state_dict'])
         
         epoch_AC = file['epoch']

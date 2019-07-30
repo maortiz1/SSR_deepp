@@ -70,7 +70,7 @@ if __name__=='__main__':
     parser.add_argument("-nr","--n_resblock",default=50,help="Desire of number of resblocks")
     parser.add_argument("-cu","--cuda",default="2",help="if cuda available number of cuda desire to be used")
     parser.add_argument("-lr","--l_rate",default=0.0001,help="learning rate for training")
-    parser.add_argument("-bt","--batch_size",default=1,help="Batch size for -bt ")
+    parser.add_argument("-bt","--batch_size",default=3,help="Batch size for -bt ")
     parser.add_argument("-ft","--factor",default=3,help="Dowmsampling data for training")
     parser.add_argument("-pw","--pretWeights",action='store_true')
     parser.add_argument("-de","--demo",action='store_true')
@@ -322,6 +322,7 @@ if __name__=='__main__':
         nib_file = nib.nifti1.Nifti1Image(recons[0],fi.affine)
         nib.save(nib_file,file)
         plt.show()
+        
     elif arguments.pretrained:
       mode_tr=[]
       down_f=[]

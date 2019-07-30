@@ -256,6 +256,7 @@ if __name__=='__main__':
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,epoch=epoch_AC,pretrained=True,file=file)
       max_epoch = 1000
       trainer.train(max_epoch)
+
     elif arguments.demo:
       import nibabel as nib
       images = arguments.images
@@ -323,7 +324,9 @@ if __name__=='__main__':
         print(len(recons))
         nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
         nib.save(nib_file,file)
-        plt.show()
+        # plt.show()
+        data_in_wh = image_utils.normalize_image_whitestripe(data,contrast='T2')
+        pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))
         recons = image_utils.reconstruct_npz(pcs,[[n_pz_x,n_pz_y]])
         nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
         name = fa.split('/')[-1]

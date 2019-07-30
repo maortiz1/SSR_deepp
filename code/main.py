@@ -317,7 +317,8 @@ if __name__=='__main__':
         name = name.split('.')[0]
         name = "test_"+name+'.nii.gz'
         file = os.path.join(os.getcwd(),name)
-        nib_file = nib.nifti1.Nifti1Image(recons,np.eye(4))
+        print(len(recons))
+        nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
         nib.save(nib_file,file)
         plt.show()
       

@@ -376,7 +376,7 @@ if __name__=='__main__':
         del file
         down_f = image_utils.downsample_isotropic
         crop = True
-        vox_size = (32,32)
+        vox_size = (64,64)
 
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
@@ -389,7 +389,7 @@ if __name__=='__main__':
       lr_train_vox = dataprep.lr_pcs_tr
       hr_train_vox = dataprep.hr_pcs_tr
       trainDataset = train.Dataset(hr_train_vox,lr_train_vox )       
-      bt_size = 5
+      bt_size = int(arguments.batch_size)
       shuffle = True
       train_data_loader = data.DataLoader(trainDataset,batch_size=bt_size,shuffle=shuffle)
      

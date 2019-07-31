@@ -20,7 +20,7 @@ def downsample(img,down_factor=3):
 
     shift_ifft_crop_ffs = np.fft.ifftshift(crop_ffs)#inverse shiftt
     ifft_crop_ffs = np.fft.ifftn(shift_ifft_crop_ffs)#inverse fast fourier transform
-
+   
     return abs(ifft_crop_ffs)#returns cropped version of the original image 
 
 
@@ -169,6 +169,7 @@ def cropall(img,vox_size=(32,32)):
             # plt.show()
             #pcs[ind,::,::,::] = pz
             pcs.append(pz)
+            print(pz.shape)
             ind +=1
         # plt.imshow(pz[::,::,70])
         # plt.show()   

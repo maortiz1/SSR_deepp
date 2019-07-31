@@ -228,8 +228,29 @@ def reconstruct_npz(scores,npzs):
 # import os
 # import numpy as np
 # import matplotlib.pyplot as plt
-# img = nib.load(os.path.join('images','T1_1.nii'))
+# img = nib.load(os.path.join('images','T1_90.nii'))
 # data = img.get_fdata()
+# dpe = downsample_isotropic(data,down_factor=5)
+# lr_nib = nib.nifti1.Nifti1Image(dpe ,np.eye(4)) 
+# norm = normalize_image_whitestripe(lr_nib)
+
+
+# data_img = norm
+# y = data_img.shape[1]
+
+# plt.imshow(data_img[::,100,::])
+# plt.show()
+# image = []
+# for y in range(0,y):
+    
+#     plt.imshow(data_img[::,y,::],cmap='gray')
+#     plt.draw()
+
+#     plt.pause(.1)
+#     plt.draw()
+
+
+
 # lr = downsample(data)
 # lr_nib = nib.nifti1.Nifti1Image(lr ,np.eye(4))
 # norm = normalize_image_whitestripe(lr_nib).get_fdata()

@@ -346,7 +346,7 @@ if __name__=='__main__':
         out_size = arguments.output_sz
         mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
         down_f= image_utils.downsample
-        file = torch.load(arguments.file)
+        file = torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
         
         epoch_AC = file['epoch']
@@ -355,13 +355,13 @@ if __name__=='__main__':
         n_resblock=arguments.n_resblock
         mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
         down_f = image_utils.downsample_isotropic
-        file =  torch.load(arguments.file)
+        file =  torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
         
         epoch_AC = file['epoch']
       elif arguments.model == 'unet3d':
         mode_tr = unet.Unet3D()
-        file =  torch.load(arguments.file)
+        file =  torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
         down_f = image_utils.downsample_isotropic
         crop = True

@@ -356,6 +356,7 @@ if __name__=='__main__':
         down_f= image_utils.downsample
         file = torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
+        del file
         
         epoch_AC = file['epoch']
 
@@ -365,12 +366,14 @@ if __name__=='__main__':
         down_f = image_utils.downsample_isotropic
         file =  torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
+        del file
         
         epoch_AC = file['epoch']
       elif arguments.model == 'unet3d':
         mode_tr = unet.Unet3D()
         file =  torch.load(arguments.file,map_location='cpu')
         mode_tr.load_state_dict(file['model_state_dict'])
+        del file
         down_f = image_utils.downsample_isotropic
         crop = True
         vox_size = (64,64)

@@ -192,7 +192,7 @@ if __name__=='__main__':
       out_f= 'all_%s_lr_%s_bt_%d_rb_%d_ft_%d'%(arguments.model,str(arguments.l_rate).replace('.','_'),bt_size,n_resblock,factor)
 
       if cuda:
-        mode_tr.to(device)
+        mode_tr = mode_tr.to(device)
    
 
 
@@ -251,7 +251,7 @@ if __name__=='__main__':
 
 
       if cuda:
-        mode_tr.to(device)
+        mode_tr = mode_tr.to(device)
 
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device,epoch=epoch_AC,pretrained=True,file=file)
       max_epoch = 1000
@@ -286,7 +286,7 @@ if __name__=='__main__':
       file_m = torch.load(file,map_location='cpu')
       mode_tr.load_state_dict(file_m['model_state_dict'])
       if cuda:
-        mode_tr.to(device)
+        mode_tr=mode_tr.to(device)
 
       fds = glob.glob(os.path.join(images,'*.nii.gz'))
       import matplotlib.pyplot as plt
@@ -405,7 +405,7 @@ if __name__=='__main__':
 
 
       if cuda:
-        mode_tr.to(device)
+        mode_tr=mode_tr.to(device)
 
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
       max_epoch = 1000

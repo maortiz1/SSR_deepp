@@ -431,7 +431,7 @@ if __name__=='__main__':
 
         down_f = image_utils.downsample_isotropic
         crop = True
-        vox_size = (64,64)
+        vox_size = (32,32)
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
       device = 'cuda:%s'%(arguments.cuda)

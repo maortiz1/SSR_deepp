@@ -450,7 +450,7 @@ if __name__=='__main__':
 
       from skimage.transform import resize
       sz= data_in_wh.shape
-      sz_out = (sz[0],sz[1],256)
+      sz_out = (sz[0],sz[1],sz[2]*int(arguments.factor))
       res = resize(data_in_wh,sz_out,mode='symmetric',order=3)
       pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))
       scr=[]

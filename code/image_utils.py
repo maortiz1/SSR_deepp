@@ -325,17 +325,17 @@ def reconstruct_npz2(scores,npzs):
 
 
 
-import nibabel as nib
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-img = nib.load(os.path.join('images','T1_90.nii'))
-cr,nx,ny,nz = cropall3(img.get_fdata())
-res =  reconstruct_npz2(cr,[[nx,ny,nz]])
-f, ax = plt.subplots(1,2)
-ax[0].imshow(img.get_fdata()[::,50,::])
-ax[1].imshow(res[0][::,50,::])
-plt.show()
+# import nibabel as nib
+# import os
+# import numpy as np
+# import matplotlib.pyplot as plt
+# img = nib.load(os.path.join('images','T1_90.nii'))
+# cr,nx,ny,nz = cropall3(img.get_fdata())
+# res =  reconstruct_npz2(cr,[[nx,ny,nz]])
+# f, ax = plt.subplots(1,2)
+# ax[0].imshow(img.get_fdata()[::,50,::])
+# ax[1].imshow(res[0][::,50,::])
+# plt.show()
 
 # import nibabel as nib
 # import os

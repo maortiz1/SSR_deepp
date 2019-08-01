@@ -455,7 +455,7 @@ if __name__=='__main__':
       sz_out = (sz[0],sz[1],sz[2]*int(arguments.factor))
       res = resize(data_in_wh,sz_out,mode='symmetric',order=3)
 
-      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall3(res,vox_size=(64,64,64))
+      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall3(res,vox_size=(64,64,256))
       scr=[]
       for img in pcs:
         data_crop = np.expand_dims(img,axis=0)

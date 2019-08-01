@@ -174,7 +174,7 @@ def cropall(img,vox_size=(32,32)):
         # plt.imshow(pz[::,::,70])
         # plt.show()   
     # print(len(pcs))
-    return pcs,n_pz_x,n_pz_y
+    return pcs,n_pz_x,n_pz_y,n_pz_z
 
 def upsample_factor(img):
     from skimage.transform import resize
@@ -220,9 +220,122 @@ def reconstruct_npz(scores,npzs):
         all_join.append(a)
     return all_join    
 
+def cropall3(img,vox_size=(32,32,32)):
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import math
+
+    size_x = img.shape[0]
+    size_y = img.shape[1]
+    size_z = img.shape[2]
+    v_x = vox_size[0]
+    v_y = vox_size[1]
+    v_z = vox_size[2]
+
+    n_pz_x = int(np.floor(size_x/v_x))
+    n_pz_y = int(np.floor(size_y/v_y))
+    n_pz_z = int(np.floor(size_z/v_z))
+    res_x = size_x - n_pz_x*v_x
+    res_y = size_y - n_pz_y*v_y
+    res_z = size_z - n_pz_z*v_z 
+    if res_x%2 == 0:
+        beg_x = int(res_x/2)
+    else:
+        beg_x = np.ceil(int(res_x/2))
+    if res_y%2 == 0:
+        beg_y = int(res_y/2)
+    else:
+        beg_y = np.ceil(int(res_y/2))
+    if res_z%2 == 0:
+        beg_z = int(res_z/2)
+    else:
+        beg_z = np.ceil(int(res_z/2))    
+
+ #   pcs = np.empty((n_pz_x*n_pz_y,v_x,v_y,size_z))
+    pcs = []
+    ind = 0
+    for i in range(0,n_pz_x):
+        for j in range(0,n_pz_y):
+            for k in range(0,n_pz_z):
+                # print('X: [%d,%d] '%(beg_x+v_x*i,beg_x+v_x*(i+1)))
+                # print('Y: [%d,%d] '%(beg_y+v_y*j,beg_y+v_y*(j+1)))
+                # print('Y: [%d,%d] '%(beg_z+v_z*k,beg_z+v_z*(k+1)))
+                pz = img[beg_x+v_x*i:beg_x+v_x*(i+1),beg_y+v_y*j:beg_y+v_y*(j+1),beg_z+v_z*k:beg_z+v_z*(k+1)]
+                print(pz.shape)
+                # plt.imshow(pz[::,::,50])
+                # plt.show()
+                #pcs[ind,::,::,::] = pz
+                pcs.append(pz)
+                # print(pz.shape)
+                ind +=1
+        # plt.imshow(pz[::,::,70])
+        # plt.show()   
+    # print(len(pcs))
+    return pcs,n_pz_x,n_pz_y,n_pz_z
+
+
+def reconstruct_npz2(scores,npzs):
+    import numpy as np
+    all_join = []
+    np_ts = npzs
+    i=0
+    for indx, f in enumerate(np_ts):
+        x_px = f[0]
+        y_px = f[1]
+        z_px = f[2]
+        n_pz = y_px*x_px*z_px
+        # print(f)
+        # print('[%d,%d] length: %d'%(i,i+n_pz,len(scores)))
+        a=[]
+        l_pz = scores[i:i+n_pz]
+        for j in range(0,x_px):
+            y_pz = l_pz[j*y_px*z_px:j*y_px*z_px+y_px*z_px]
+
+            cot = []
+            for k in range(0,y_px):
+                z_pz = y_pz[k*z_px:k*z_px+z_px]
+                cotz=[]
+                for l in range(0,z_px):
+                    
+                    if l == 0:
+                        cotz=z_pz[l]
+                    else:
+                        cotz= np.concatenate((cotz,z_pz[l]),axis=2)
+                    print(cotz.shape)
+                    
+                
+                # plt.imshow(ac[::,::,100])
+                # plt.show()
+                # print(ac.shape)
+                if k == 0:
+                    cot = cotz
+                else:
+                    cot=np.concatenate((cot,cotz),axis=1)
+
+                # plt.imshow(cot[::,::,100])
+                # plt.show()
+            if j == 0:
+                a = cot
+            else:
+                a = np.concatenate((a,cot),axis=0)
+        i=n_pz+i
+
+        all_join.append(a)
+    return all_join    
 
 
 
+import nibabel as nib
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+img = nib.load(os.path.join('images','T1_90.nii'))
+cr,nx,ny,nz = cropall3(img.get_fdata())
+res =  reconstruct_npz2(cr,[[nx,ny,nz]])
+f, ax = plt.subplots(1,2)
+ax[0].imshow(img.get_fdata()[::,50,::])
+ax[1].imshow(res[0][::,50,::])
+plt.show()
 
 # import nibabel as nib
 # import os
@@ -315,3 +428,4 @@ def reconstruct_npz(scores,npzs):
 # ax[0].imshow(data[::,50,::])
 # ax[1].imshow(data_norm[::,50,::])
 # plt.show()
+

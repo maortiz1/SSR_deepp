@@ -431,7 +431,7 @@ if __name__=='__main__':
 
         down_f = image_utils.downsample_isotropic
         crop = True
-        vox_size = (32,32)
+        vox_size = (64,64)
       gpu = int(arguments.cuda)
       torch.cuda.set_device(gpu)
       device = 'cuda:%s'%(arguments.cuda)
@@ -455,7 +455,7 @@ if __name__=='__main__':
       sz_out = (sz[0],sz[1],sz[2]*int(arguments.factor))
       res = resize(data_in_wh,sz_out,mode='symmetric',order=3)
 
-      pcs,n_pz_x,n_pz_y = image_utils.cropall(res,vox_size=(64,64))
+      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall2(res,vox_size=(64,64,64))
       scr=[]
       for img in pcs:
         data_crop = np.expand_dims(img,axis=0)
@@ -466,7 +466,7 @@ if __name__=='__main__':
         s = score.squeeze().permute(1,2,0)
         s_cpu = s.cpu().data.numpy()
         scr.append(s_cpu)
-      recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
+      recons = image_utils.reconstruct_npz2(scr,[[n_pz_x,n_pz_y,n_pz_z]])
       nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
       name = image.split('/')[-1]
       name = name.split('.')[0]

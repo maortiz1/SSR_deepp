@@ -444,9 +444,9 @@ if __name__=='__main__':
 
 
       image = arguments.images
-      fi= nib.load(image)  
-      data_in = abs(np.fft.ifftn(np.fft.ifftshift(np.fft.fftshift(np.fft.fftn(fi.get_fdata())))))
-      data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
+      data_inwh= nib.load(image)  
+      data_in = abs(np.fft.ifftn(np.fft.ifftshift(np.fft.fftshift(np.fft.fftn(data_inwh.get_fdata())))))
+      # data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
       data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T1')
       
 

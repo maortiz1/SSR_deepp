@@ -62,7 +62,7 @@ if __name__=='__main__':
     parser.add_argument("-t","--test",help="runs modely only on validation if model is saved",dest='test',action='store_true')
     parser.add_argument("-tr","--train",help="runs only train",action='store_true',dest='train')
 
-    parser.add_argument("-m","--model",default='ResNET',help='model to use')
+    parser.add_argument("-m","--model",default='unet3d',help='model to use')
     parser.add_argument("-p","--pretrained",help="if model is pretrained",dest='pretrained',action='store_true')
     parser.add_argument("-f","--file",default = "ResNET_lr_0_0001_bt_5_rb_50/che_epoch_13.pth.tar",help="path where the pretrained model is for test or pretrained training")
     parser.add_argument("-o","--output_sz",default=(256,32,32),help="desire output size for training")
@@ -445,7 +445,9 @@ if __name__=='__main__':
 
       image = arguments.images
       fi= nib.load(image)  
-      data_in_wh = image_utils.normalize_image_whitestripe(fi,contrast='T1')
+      data_in = abs(np.fft.ifftn(np.fft.ifftshift(np.fft.fftshift(np.fft.fftn(fi.get_fdata())))))
+      data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
+      data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T1')
       
 
       from skimage.transform import resize

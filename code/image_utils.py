@@ -261,7 +261,7 @@ def cropall3(img,vox_size=(32,32,32)):
                 # print('Y: [%d,%d] '%(beg_y+v_y*j,beg_y+v_y*(j+1)))
                 # print('Y: [%d,%d] '%(beg_z+v_z*k,beg_z+v_z*(k+1)))
                 pz = img[beg_x+v_x*i:beg_x+v_x*(i+1),beg_y+v_y*j:beg_y+v_y*(j+1),beg_z+v_z*k:beg_z+v_z*(k+1)]
-                print(pz.shape)
+                # print(pz.shape)
                 # plt.imshow(pz[::,::,50])
                 # plt.show()
                 #pcs[ind,::,::,::] = pz
@@ -301,7 +301,7 @@ def reconstruct_npz2(scores,npzs):
                         cotz=z_pz[l]
                     else:
                         cotz= np.concatenate((cotz,z_pz[l]),axis=2)
-                    print(cotz.shape)
+                    # print(cotz.shape)
                     
                 
                 # plt.imshow(ac[::,::,100])

@@ -75,7 +75,8 @@ if __name__=='__main__':
     parser.add_argument("-pw","--pretWeights",action='store_true')
     parser.add_argument("-de","--demo",action='store_true')
     parser.add_argument("-con","--contt",action='store_true')
-
+    parser.add_argument("-ex","--oneEx",action='store_true')
+    
    # parser.add_argument("-af","--autof",action='store_true','')
    # parser.add_argument("-svf","--f_safe",help="folder to safe model")
 
@@ -410,7 +411,67 @@ if __name__=='__main__':
       trainer = train.Trainer(train_data_loader,test_data_loader,cuda,3,mode_tr,float(arguments.l_rate),out_f,device)
       max_epoch = 1000
       trainer.train(max_epoch)        
+    if arguments.oneEx:
+      import nibabel as nib
+      
+      file =arguments.file
+      if arguments.model == 'ResNET':
+        n_resblock = arguments.n_resblock
+        out_size = arguments.output_sz
+        mode_tr = model.ResNET(n_resblocks=n_resblock,output_size=out_size)
+        down_f= image_utils.downsample
+        vox_size = (32,32)
+      elif arguments.model == 'ResNetIso':
+        n_resblock=arguments.n_resblock
+        mode_tr = model.ResNetIso(n_resblocks=n_resblock,res_scale=0.1)
+        down_f = image_utils.downsample_isotropic
+        vox_size = (32,32)
+      elif arguments.model == 'unet3d':
+        mode_tr = unet.Unet3D()
 
+        down_f = image_utils.downsample_isotropic
+        crop = True
+        vox_size = (64,64)
+      gpu = int(arguments.cuda)
+      torch.cuda.set_device(gpu)
+      device = 'cuda:%s'%(arguments.cuda)
+      
+      cuda = torch.cuda.is_available()
+      file_m = torch.load(file,map_location='cpu')
+      mode_tr.load_state_dict(file_m['model_state_dict'])
+      if cuda:
+        mode_tr=mode_tr.to(device)
+
+
+      image = arguments.images
+      fi= nib.load(image)  
+      data_in_wh = image_utils.normalize_image_whitestripe(fi,contrast='T1')
+      
+
+      from skimage.transform import resize
+      sz= data_in_wh.shape
+      sz_out = (sz[0],sz[1],256)
+      res = resize(data_in_wh,sz_out,mode='symmetric',order=3)
+      pcs,n_pz_x,n_pz_y = image_utils.cropall(data_in_wh,vox_size=(64,64))
+      scr=[]
+      for img in pcs:
+        data_crop = np.expand_dims(img,axis=0)
+        x = torch.from_numpy(np.expand_dims(data_crop,axis=0).astype(np.float32)).permute(0,1,4,2,3)
+        if cuda:       
+          x= x.to(device)
+        score = mode_tr(x)
+        s = score.squeeze().permute(1,2,0)
+        s_cpu = s.cpu().data.numpy()
+        scr.append(s_cpu)
+    recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
+    nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
+    name = image.split('/')[-1]
+    name = name.split('.')[0]
+    name = "oneEx_down_"+name+'.nii'
+    file = os.path.join(os.getcwd(),name)
+    nib.save(nib_file,file)
+
+  
 
 
 

@@ -166,7 +166,7 @@ class Test():
           ax[0,0].title.set_text('Expected Output')
           ax[0,1].imshow(self.recons_scores[ra][::,50,::],cmap='gray')
           ax[0,1].axis('off')
-          ax[0,1].title.set_text(('Output ResNet PSNR: %.2f dB')%(psnr_d))
+          ax[0,1].title.set_text(('Output PSNR: %.2f dB')%(psnr_d))
           ax[1,0].imshow(self.recons_data[ra][::,50,::],cmap='gray')
           ax[1,0].axis('off')
           ax[1,0].title.set_text('Input Data')

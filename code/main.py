@@ -466,15 +466,15 @@ if __name__=='__main__':
         s = score.squeeze().permute(1,2,0)
         s_cpu = s.cpu().data.numpy()
         scr.append(s_cpu)
-    recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
-    nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
-    name = image.split('/')[-1]
-    name = name.split('.')[0]
-    name = "oneEx_down_"+name+'.nii'
-    file = os.path.join(os.getcwd(),name)
-    nib.save(nib_file,file)
+      recons = image_utils.reconstruct_npz(scr,[[n_pz_x,n_pz_y]])
+      nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))
+      name = image.split('/')[-1]
+      name = name.split('.')[0]
+      name = "oneEx_down_"+name+'.nii'
+      file = os.path.join(os.getcwd(),name)
+      nib.save(nib_file,file)
 
-  
+    
 
 
 

@@ -174,7 +174,7 @@ def cropall(img,vox_size=(32,32)):
         # plt.imshow(pz[::,::,70])
         # plt.show()   
     # print(len(pcs))
-    return pcs,n_pz_x,n_pz_y,n_pz_z
+    return pcs,n_pz_x,n_pz_y
 
 def upsample_factor(img):
     from skimage.transform import resize

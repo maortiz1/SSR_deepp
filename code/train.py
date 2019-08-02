@@ -13,6 +13,15 @@ import glob
 import os
 import math
 import nibabel as nib 
+
+
+import re
+numbers = re.compile(r'(\d+)')
+def numericalSort(value):
+    parts = numbers.split(value)
+    parts[1::2] = map(int, parts[1::2])
+    return parts
+
 class Trainer:
     def __init__(self, loader_train,loader_val,cuda,scale,model,lr,out,device,sch=True,st=50,epoch=0,pretrained = False,file=''):
         self.scale = scale #scale_factor
@@ -179,7 +188,8 @@ class Data_Preparation():
         self.mk_val = val
         self.mk_test=test
         if os.path.isdir(root_hr):
-            self.gt_hr= glob.glob(os.path.join(root_hr,'*.nii'))
+            self.gt_hr=sorted( glob.glob(os.path.join(root_hr,'*.nii')),key=numericalSort)
+            print(self.gt_hr)
         else:
             raise Exception('Root has to be a directory')
         self.generate_voxels(factor,vox_size,train_size,downfunction=downfunction)
@@ -234,28 +244,39 @@ class Data_Preparation():
         if self.mk_train:
             for k in factor:
                 for i in  tr_samples:
-                    img = nib.load(i)
-                    data_img = img.get_fdata()
-                    
-                    lr_temp = downfunction(data_img,down_factor=k)
-                    nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
-                    wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
-            
+                    if 'T1' in i:
+                        img = nib.load(i)
+                        data_img = img.get_fdata()
+                        
+                        lr_temp = downfunction(data_img,down_factor=k)
+                        nib_f_lr = nib.nifti1.Nifti1Image(lr_temp ,np.eye(4))
+                        wh_norm_lr = utils.normalize_image_whitestripe(nib_f_lr,contrast='T1')
+                
 
-                    wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
-                    if self.crop:
-                        lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
-                        hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
-                        n_p_ls =[n_x_hr,n_y_hr]
-                        n_pc.append(n_p_ls)
-                        lr_pcs += lr_pc
-                        hr_pcs += hr_pc
-                    else:
-                        lr_pcs.append(wh_norm_lr)
-                        hr_pcs.append(wh_norm_hr)
-                    
-                    indx +=1
-                    num_im.append(indx)
+                        wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+
+                        wh_norm_hr = utils.normalize_image_whitestripe(img,contrast='T1')
+                        if self.crop:
+                            lr_pc,n_x_lr,n_y_lr = utils.cropall(wh_norm_lr,vox_size)
+                            hr_pc,n_x_hr,n_y_hr = utils.cropall(wh_norm_hr,vox_size)
+                            n_p_ls =[n_x_hr,n_y_hr]
+                            n_pc.append(n_p_ls)
+                            lr_pcs += lr_pc
+                            hr_pcs += hr_pc
+                        else:
+                            lr_pcs.append(wh_norm_lr)
+                            hr_pcs.append(wh_norm_hr)
+                        img_T2 = nib.load(i.replace('T1','T2'))
+                        data_img_T2 = img_T2.get_fdata()
+                        
+                        lr_temp_T2 = downfunction(data_img_T2,down_factor=k)
+                        nib_f_lr_T2 = nib.nifti1.Nifti1Image(lr_temp_T2 ,np.eye(4))
+                        wh_norm_lr_T2 = utils.normalize_image_whitestripe(nib_f_lr_T2,contrast='T2')           
+                                    
+
+
+                        indx +=1
+                        num_im.append(indx)
             self.lr_pcs_tr = lr_pcs
             self.hr_pcs_tr = hr_pcs
             self.tr_cr_pcs = n_pc
@@ -440,14 +461,16 @@ class Dataset(data.Dataset):
         return x,y
 
 
+
+
 #import matplotlib.pyplot as plt
-#root = os.path.join(os.getcwd(),'images')
+root = os.path.join(os.getcwd(),'images')
 #import nibabel as nib
 # img =nib.load(os.path.join(root,'T1_1.nii'))
 # data = img.get_fdata()
 # plt.imshow(data[::,50,::])
 # plt.show()
-#dataprep = Data_Preparation(root)
+dataprep = Data_Preparation(root)
 #lr_tr = dataprep.hr_pcs_tr
 #print(len(lr_tr))
 

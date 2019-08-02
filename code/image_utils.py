@@ -241,15 +241,15 @@ def cropall3(img,vox_size=(32,32,32)):
     if res_x%2 == 0:
         beg_x = int(res_x/2)
     else:
-        beg_x = np.ceil(int(res_x/2))
+        beg_x = int(np.ceil(int(res_x/2)))
     if res_y%2 == 0:
         beg_y = int(res_y/2)
     else:
-        beg_y = np.ceil(int(res_y/2))
+        beg_y = int(np.ceil(int(res_y/2)))
     if res_z%2 == 0:
         beg_z = int(res_z/2)
     else:
-        beg_z = np.ceil(int(res_z/2))    
+        beg_z = int(np.ceil(int(res_z/2)) )   
 
  #   pcs = np.empty((n_pz_x*n_pz_y,v_x,v_y,size_z))
     pcs = []
@@ -259,7 +259,7 @@ def cropall3(img,vox_size=(32,32,32)):
             for k in range(0,n_pz_z):
                 # print('X: [%d,%d] '%(beg_x+v_x*i,beg_x+v_x*(i+1)))
                 # print('Y: [%d,%d] '%(beg_y+v_y*j,beg_y+v_y*(j+1)))
-                # print('Y: [%d,%d] '%(beg_z+v_z*k,beg_z+v_z*(k+1)))
+                # print('Z: [%d,%d] '%(beg_z+v_z*k,beg_z+v_z*(k+1)))
                 pz = img[beg_x+v_x*i:beg_x+v_x*(i+1),beg_y+v_y*j:beg_y+v_y*(j+1),beg_z+v_z*k:beg_z+v_z*(k+1)]
                 # print(pz.shape)
                 # plt.imshow(pz[::,::,50])

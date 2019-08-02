@@ -10,7 +10,7 @@ import os
 import test
 import numpy as np
 import glob
-
+import matplotlib.pyplot as plt
 def main():
  
     gpu = 0
@@ -447,15 +447,16 @@ if __name__=='__main__':
       data_inwh= nib.load(image)  
       data_in = abs(np.fft.ifftn(np.fft.ifftshift(np.fft.fftshift(np.fft.fftn(data_inwh.get_fdata())))))
       # data_inwh = nib.nifti1.Nifti1Image(data_in,np.eye(4))
-      data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T1')
+      data_in_wh = image_utils.normalize_image_whitestripe(data_inwh,contrast='T2')
       
 
       from skimage.transform import resize
       sz= data_in_wh.shape
       sz_out = (sz[0],sz[1],sz[2]*int(arguments.factor))
       res = resize(data_in_wh,sz_out,mode='symmetric',order=3)
-
-      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall3(res,vox_size=(64,64,256))
+      print(res.shape)
+      
+      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall3(res,vox_size=(64,64,64))
       scr=[]
       for img in pcs:
         data_crop = np.expand_dims(img,axis=0)
@@ -465,6 +466,8 @@ if __name__=='__main__':
         score = mode_tr(x)
         s = score.squeeze().permute(1,2,0)
         s_cpu = s.cpu().data.numpy()
+        plt.imshow(s_cpu[::,30,::],cmap='gray')       
+        plt.show() 
         scr.append(s_cpu)
       recons = image_utils.reconstruct_npz2(scr,[[n_pz_x,n_pz_y,n_pz_z]])
       nib_file = nib.nifti1.Nifti1Image(recons[0],np.eye(4))

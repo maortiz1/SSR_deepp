@@ -25,7 +25,10 @@ class Test():
         self.losses_epoc = self.fileC['m_los']
         self.psnr = self.fileC['psnr']
         self.ssim = self.fileC['ssim']
-        
+        self.best_psnr =0
+        self.best_t = []
+        self.best_d = []
+        self.best_s = []
         if cuda:
             model.to(device)
             # from torchsummary import summary
@@ -74,14 +77,19 @@ class Test():
                 p,s = self.metrics(t.squeeze(),s.squeeze())
                 psnr_ts.append(p)
                 ssim_ts.append(s)
-            
+
             d = data.squeeze().permute(1,2,0)
             d_cpu = d.cpu().data.numpy()
             t = target.squeeze().permute(1,2,0)
             t_cpu = t.cpu().data.numpy()
             s = score.squeeze().permute(1,2,0)
             s_cpu = s.cpu().data.numpy()
-            
+            if self.best_psnr<p:
+               self.best_psnr=p
+               self.best_t = t_cpu
+               self.best_d = d_cpu
+               self.best_s = s_cpu
+                        
             
             self.data.append(d_cpu)
             
@@ -214,8 +222,20 @@ class Test():
         self.recons_org = recons_org
         self.recons_data = recons_input
         
-    def test_1all(self):
+    def test_best(self):
         import matplotlib.pyplot as plt
+        fig,ax = plt.subplots(3,1)
+
+        ax[0].imshow(self.best_t[::,15,::],cmap='gray')
+        ax[0].title.set_text('Target')
+        ax[0].axis('off')
+        ax[1].imshow(self.best_d[::,15,::],cmap='gray')
+        ax[1].axis('off')
+        ax[1].title.set_text('input')
+        ax[2].imshow(self.best_s[::,15,::],cmap='gray')
+        ax[2].title.set_text('Output: %2.f'%(self.best_psnr))
+        ax[1].axis('off')
+        plt.show()
         
       
             

@@ -138,9 +138,10 @@ if __name__=='__main__':
         
         test = test.Test(val_data_loader,train_data_loader,dataprep,file,cuda,device,mode_tr)
         
-        test.vis_3()
-        test.plot_history_loss()
-        test.vis()
+       # test.vis_3()
+        #test.plot_history_loss()
+        #test.vis()
+        test.test_best()
   
     elif arguments.train:
       mode_tr=[]
@@ -456,7 +457,7 @@ if __name__=='__main__':
       res = resize(data_in_wh,sz_out,mode='symmetric',order=3)
       print(res.shape)
       
-      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall3(res,vox_size=(64,64,64))
+      pcs,n_pz_x,n_pz_y,n_pz_z = image_utils.cropall3(res,vox_size=(64,64,256))
       scr=[]
       for img in pcs:
         data_crop = np.expand_dims(img,axis=0)
